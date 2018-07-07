@@ -22,8 +22,8 @@ class Krzyzyk(Symbol):
     """symbol krzyżyk"""
     repr_graf = Krzyzyk_graf()
 
-class __Siatka:
-    def __init__(wierszy=15, kolumn = 15):
+class Siatka:
+    def __init__(self, wierszy=15, kolumn = 15):
         self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
 
     def odczyt_pozycja(self, wiersz, kolumna):
@@ -31,25 +31,50 @@ class __Siatka:
 
     def zapis_pozycja(self, wiersz, kolumna, sym):
         self.pola[wiersz][kolumna] = sym
+    
+class Polozenie(object):
+    """ pozycja """
+    def __init__(self, wiersz, kolumna):
+        self.poz = [wiersz, kolumna]
 
+    def w_lewo(self):
+        self.poz[0] -= 1
+
+    def w_prawo(self):
+        self.poz[0] -= 1
+
+    def w_gore(self):
+        self.poz[1] -= 1
+
+    def w_dol(self):
+        self.poz[1] += 1
+
+    def __getitem__(self, key):
+        return self.poz[key]
+        
 class Plansza:
     """reprentuje prostokątną planszę na której stawiane są kółka lub
     krzyżyki
     """
 
     def __init__(self, surface, wierszy=15, kolumn=15):
-        self.pola = __Siatka(wierszy, kolumn)
+        self.pola = Siatka(wierszy, kolumn)
         self.wierszy = wierszy
         self.kolumn = kolumn
         self.surface = surface
 
     def postaw_na_pozycji_symbol(self, poz, symbol):
-        pola.zapis_pozycja(*poz, symbol)
+        self.pola.zapis_pozycja(*poz, symbol)
 
     def jest_zapelniona(self):
         zap = True
-        for wiersz in self.pola:
-            zap = zap and all(kol is not None for kol in wiersz)
+        def zajeta(nr_wiersza, nr_kolumny):
+            pola = self.pola
+            symbol = pola.odczyt_pozycja(nr_wiersza, nr_kolumny)
+            return symbol is not None
+        for nr_wiersza in range(self.wierszy):
+            for nr_kolumny in range(self.kolumn):
+                zap = zap  and zajeta(nr_wiersza, nr_kolumny)
         return zap
 
     def ma_uklad_wygrywajacy(self, pozycja):
@@ -63,60 +88,77 @@ class Plansza:
                         self.ma_uklad_wygrywajacy_ukos_prawy(pozycja)])
         return any(pyt for pyt in pytania)
 
+
+    def pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
+        pola = self.pola
+        return pola.odczyt_pozycja(nr_wiersza, nr_kolumny) == symbol
+    
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
-        symbol = self.pola[pozycja[0]][pozycja[1]]
+        kolumna = 0
+        wiersz = 1
+        pola = self.pola
+        polozenie = Polozenie(*pozycja)
+        symbol = pola.odczyt_pozycja(*polozenie)
         licznik = 0
-        def pasuje():
-            return self.pola[pozycja[0]][nr_kolumny] == symbol
         #idź w prawo
-        nr_kolumny = pozycja[1]
-        while nr_kolumny < self.kolumn and pasuje():
+        while (polozenie[kolumna] < self.kolumn
+               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
-            nr_kolumny += 1
+            polozenie.w_dol()
         # bteraz w lewo
-        nr_kolumny = pozycja[1] - 1
-        while nr_kolumny >= 0 and pasuje():
+        polozenie = Polozenie(*pozycja)
+        polozenie.w_gore()
+        while (polozenie[kolumna] >= 0
+               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
-            nr_kolumny -= 1
+            polozenie.w_gore()
+        if licznik >= 5:
+            print('ma_uklad_wygrywajacy_poziom')
         return licznik >= 5
 
     def ma_uklad_wygrywajacy_pion(self, pozycja):
-        symbol = self.pola[pozycja[0]][pozycja[1]]
+        pola = self.pola
+        symbol = pola.odczyt_pozycja(*pozycja)
         licznik = 0
         nr_wiersza, nr_kolumny = pozycja
-        def pasuje():
-            return self.pola[nr_wiersza][nr_kolumny] == symbol
+        spr_wiersz = nr_wiersza
         #idź w dół
-        while nr_wiersza < self.wierszy and pasuje():
+        while (spr_wiersz < self.wierszy
+               and self.pasuje_pozycja_symbol(spr_wiersz, nr_kolumny, symbol)):
             licznik += 1
-            nr_wiersza += 1
+            spr_wiersz += 1
         #idź w górę
-        nr_wiersza, nr_kolumny = pozycja
-        while nr_wiersza >= 0 and pasuje():
+        spr_wiersz = nr_wiersza - 1
+        while (spr_wiersz >= 0
+               and self.pasuje_pozycja_symbol(spr_wiersz, nr_kolumny, symbol)):
             licznik += 1
-            nr_wiersza -= 1
+            spr_wiersz -= 1
+        if licznik >= 5:
+            print('ma_uklad_wygrywajacy_pion')
         return licznik >= 5
 
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
-        symbol = self.pola[pozycja[0]][pozycja[1]]
+        pola = self.pola
+        symbol = pola.odczyt_pozycja(*pozycja)
         nr_wiersza, nr_kolumny = pozycja
+        spr_wiersz, spr_kolumna = nr_wiersza, nr_kolumny
         licznik = 0
-        def pasuje(nr_wiersza, nr_kolumny):
-            return self.pola[nr_wiersza][nr_kolumny] == symbol
-        while (nr_wiersza < self.wierszy and
-               nr_kolumny < self.kolumn and
-               pasuje(nr_wiersza, nr_kolumny)):
+        while (spr_wiersz < self.wierszy and
+               spr_kolumna < self.kolumn and
+               self.pasuje_pozycja_symbol(spr_wiersz, spr_kolumna, symbol)):
             licznik += 1
-            nr_wiersza += 1
-            nr_kolumny += 1
+            spr_wiersz, spr_kolumna = spr_wiersz + 1, spr_kolumna + 1
         #idź w górę
-        nr_wiersza, nr_kolumny = pozycja
-        while (nr_wiersza >= 0 and nr_kolumny >= 0 and
-               pasuje(nr_wiersza, nr_kolumny)):
+        spr_wiersz, spr_kolumna = nr_wiersza - 1, nr_kolumny - 1
+        while (spr_wiersz >= 0 and spr_kolumna >= 0 and
+               self.pasuje_pozycja_symbol(spr_wiersz, nr_kolumny, symbol)):
             licznik += 1
-            nr_wiersza -= 1
-            nr_kolumny -= 1
-
+            spr_wiersz -= 1
+            spr_kolumna -= 1
+        if licznik >= 5:
+            print('ma_uklad_wygrywajacy_ukos_lewy')
+        return licznik >= 5
+    
     def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
         pass
 
