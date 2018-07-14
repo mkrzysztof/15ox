@@ -38,16 +38,16 @@ class Polozenie(object):
         self.poz = [wiersz, kolumna]
 
     def w_lewo(self):
-        self.poz[0] -= 1
-
-    def w_prawo(self):
-        self.poz[0] -= 1
-
-    def w_gore(self):
         self.poz[1] -= 1
 
-    def w_dol(self):
+    def w_prawo(self):
         self.poz[1] += 1
+
+    def w_gore(self):
+        self.poz[0] -= 1
+
+    def w_dol(self):
+        self.poz[0] += 1
 
     def __getitem__(self, key):
         return self.poz[key]
@@ -65,6 +65,7 @@ class Plansza:
 
     def postaw_na_pozycji_symbol(self, poz, symbol):
         self.pola.zapis_pozycja(*poz, symbol)
+        print(poz)
 
     def jest_zapelniona(self):
         zap = True
@@ -94,8 +95,8 @@ class Plansza:
         return pola.odczyt_pozycja(nr_wiersza, nr_kolumny) == symbol
     
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
-        kolumna = 0
-        wiersz = 1
+        kolumna = 1
+        wiersz = 0
         pola = self.pola
         polozenie = Polozenie(*pozycja)
         symbol = pola.odczyt_pozycja(*polozenie)
@@ -104,14 +105,14 @@ class Plansza:
         while (polozenie[kolumna] < self.kolumn
                and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
-            polozenie.w_dol()
+            polozenie.w_prawo()
         # bteraz w lewo
         polozenie = Polozenie(*pozycja)
-        polozenie.w_gore()
+        polozenie.w_lewo()
         while (polozenie[kolumna] >= 0
                and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
-            polozenie.w_gore()
+            polozenie.w_lewo()
         if licznik >= 5:
             print('ma_uklad_wygrywajacy_poziom')
         return licznik >= 5
@@ -172,7 +173,7 @@ class Gracz(object):
 
     def wyszukaj_wolne_pole(self, plansza):
         """metoda obstrakcyjna zwraca 2-kę reprezentującą położenie
-        na polu planszy"""
+        na polu planszy w formacie [nr_wiersza, nr_kolumny]"""
         pass
 
     def postaw_symbol_na_planszy(self, plansza):

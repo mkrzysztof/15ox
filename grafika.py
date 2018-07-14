@@ -12,10 +12,10 @@ class Symbol_graf:
     sym = None
     @classmethod
     def rysuj_na_pozycji(cls, pozycja, surface):
-        poz_x = Parametry.poczatek[0] + pozycja[0] * Parametry.wielkosc +\
-            pozycja[0] + 1
-        poz_y = Parametry.poczatek[1] + pozycja[1] * Parametry.wielkosc +\
+        poz_x = Parametry.poczatek[1] + pozycja[1] * Parametry.wielkosc +\
             pozycja[1] + 1
+        poz_y = Parametry.poczatek[0] + pozycja[0] * Parametry.wielkosc +\
+            pozycja[0] + 1
         surface.blit(cls.sym, (poz_x, poz_y))
         pygame.display.flip()
         
@@ -61,7 +61,7 @@ def odczyt_poz_myszy():
     wyj = False
     while not wyj:
         poz = pygame.mouse.get_pos()
-        poz = (poz[0] - Parametry.poczatek[0], poz[1] - Parametry.poczatek[0])
+        poz = [poz[1] - Parametry.poczatek[1], poz[0] - Parametry.poczatek[0]]
         poz_w = [x // (Parametry.wielkosc + 1) for x in poz]
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
