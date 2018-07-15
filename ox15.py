@@ -3,6 +3,12 @@
 from grafika import odczyt_poz_myszy, rysuj_siatke, Kolko_graf, Krzyzyk_graf
 import pygame
 
+def pokaz_wywolanie(f):
+    def opakowanie(*args, **kwds):
+        print('wywołuję: ', f.__name__)
+        return f(*args, **kwds)
+    return opakowanie
+
 class Symbol(object):
     """klasa abstrakcyjna reprezentująca kółko lub krzyżykl"""
     repr_graf = None
@@ -37,21 +43,35 @@ class Polozenie(object):
     def __init__(self, wiersz, kolumna):
         self.poz = [wiersz, kolumna]
 
+    @pokaz_wywolanie
     def w_lewo(self):
         self.poz[1] -= 1
 
+    @pokaz_wywolanie
     def w_prawo(self):
         self.poz[1] += 1
 
+    @pokaz_wywolanie
     def w_gore(self):
         self.poz[0] -= 1
 
+    @pokaz_wywolanie
     def w_dol(self):
         self.poz[0] += 1
 
     def __getitem__(self, key):
         return self.poz[key]
-        
+
+    def nie_wychodzi_poza(self, plansza):
+        """ sprawdza xzy położenie wychodzi poza planszę """
+        wiersz = 0
+        kolumna = 1
+        wyj = (self[wiersz] >= 0
+               or self[wiersz] < plansza.wierszy
+               or self[kolumna] >= 0
+               or self[kolumna] < plansza.kolumn)
+        return wyj
+    
 class Plansza:
     """reprentuje prostokątną planszę na której stawiane są kółka lub
     krzyżyki
@@ -67,6 +87,7 @@ class Plansza:
         self.pola.zapis_pozycja(*poz, symbol)
         print(poz)
 
+    @pokaz_wywolanie
     def jest_zapelniona(self):
         zap = True
         def zajeta(nr_wiersza, nr_kolumny):
@@ -84,16 +105,15 @@ class Plansza:
         """
         pytania = []
         pytania.extend([self.ma_uklad_wygrywajacy_pion(pozycja),
-                        self.ma_uklad_wygrywajacy_poziom(pozycja),
-                        self.ma_uklad_wygrywajacy_ukos_lewy(pozycja),
-                        self.ma_uklad_wygrywajacy_ukos_prawy(pozycja)])
+                        self.ma_uklad_wygrywajacy_poziom(pozycja)])
         return any(pyt for pyt in pytania)
 
 
     def pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
         pola = self.pola
         return pola.odczyt_pozycja(nr_wiersza, nr_kolumny) == symbol
-    
+
+    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
         kolumna = 1
         wiersz = 0
@@ -102,14 +122,14 @@ class Plansza:
         symbol = pola.odczyt_pozycja(*polozenie)
         licznik = 0
         #idź w prawo
-        while (polozenie[kolumna] < self.kolumn
+        while (polozenie.nie_wychodzi_poza(self)
                and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
             polozenie.w_prawo()
         # bteraz w lewo
         polozenie = Polozenie(*pozycja)
         polozenie.w_lewo()
-        while (polozenie[kolumna] >= 0
+        while (polozenie.nie_wychodzi_poza(self)
                and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
             polozenie.w_lewo()
@@ -117,27 +137,33 @@ class Plansza:
             print('ma_uklad_wygrywajacy_poziom')
         return licznik >= 5
 
+    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_pion(self, pozycja):
+        wiersz = 0
+        kolumna = 1
         pola = self.pola
+        polozenie = Polozenie(*pozycja)
         symbol = pola.odczyt_pozycja(*pozycja)
         licznik = 0
         nr_wiersza, nr_kolumny = pozycja
         spr_wiersz = nr_wiersza
         #idź w dół
-        while (spr_wiersz < self.wierszy
-               and self.pasuje_pozycja_symbol(spr_wiersz, nr_kolumny, symbol)):
+        while (polozenie[wiersz] < self.wierszy
+               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
-            spr_wiersz += 1
+            polozenie.w_dol()
         #idź w górę
-        spr_wiersz = nr_wiersza - 1
-        while (spr_wiersz >= 0
-               and self.pasuje_pozycja_symbol(spr_wiersz, nr_kolumny, symbol)):
+        polozenie = Polozenie(*pozycja)
+        polozenie.w_gore()
+        while (polozenie[wiersz] >= 0
+               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
             licznik += 1
-            spr_wiersz -= 1
+            polozenie.w_gore()
         if licznik >= 5:
             print('ma_uklad_wygrywajacy_pion')
         return licznik >= 5
 
+    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
         pola = self.pola
         symbol = pola.odczyt_pozycja(*pozycja)
