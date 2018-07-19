@@ -137,6 +137,10 @@ class Plansza:
             print('ma_uklad_wygrywajacy_poziom')
         return licznik >= 5
 
+    def zawiera_pozycje(self, pozycja):
+        return (pozycja[0] >= 0 and pozycja[0] < self.wierszy
+                and pozycja[1] >= 0 and pozycja[1] < self.kolumn)
+
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_pion(self, pozycja):
         wiersz = 0
@@ -215,8 +219,13 @@ class Gracz(object):
 class Gracz_Czlowiek(Gracz):
     """Klasa reprezentująca człowieka"""
     def wyszukaj_wolne_pole(self, plansza):
-        return odczyt_poz_myszy()
-
+        zla_pozycja = True
+        while zla_pozycja:
+            pozycja = odczyt_poz_myszy()
+            if plansza.zawiera_pozycje(pozycja):
+                zla_pozycja = False
+        return pozycja
+            
 
 class Gracz_komputer(Gracz):
     pass
