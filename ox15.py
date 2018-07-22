@@ -67,9 +67,9 @@ class Polozenie(object):
         wiersz = 0
         kolumna = 1
         wyj = (self[wiersz] >= 0
-               or self[wiersz] < plansza.wierszy
-               or self[kolumna] >= 0
-               or self[kolumna] < plansza.kolumn)
+               and self[wiersz] < plansza.wierszy
+               and self[kolumna] >= 0
+               and self[kolumna] < plansza.kolumn)
         return wyj
     
 class Plansza:
@@ -113,6 +113,14 @@ class Plansza:
         pola = self.pola
         return pola.odczyt_pozycja(nr_wiersza, nr_kolumny) == symbol
 
+    def zliczaj_symbole_w_kierunku(self, polozenie, kierunek, licznik = 0):
+        while polozenie.nie_wychodzi_poza(self):
+            if self.pasuje_pozycja_symbol(*polozenie, symbol):
+                licznik += 1
+                kierunek()
+            else:
+                break
+
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
         kolumna = 1
@@ -122,24 +130,25 @@ class Plansza:
         symbol = pola.odczyt_pozycja(*polozenie)
         licznik = 0
         #idź w prawo
-        while (polozenie.nie_wychodzi_poza(self)
-               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
-            licznik += 1
-            polozenie.w_prawo()
+        while polozenie.nie_wychodzi_poza(self):
+            if self.pasuje_pozycja_symbol(*polozenie, symbol):
+                licznik += 1
+                polozenie.w_prawo()
+            else:
+                break
         # bteraz w lewo
         polozenie = Polozenie(*pozycja)
         polozenie.w_lewo()
-        while (polozenie.nie_wychodzi_poza(self)
-               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
-            licznik += 1
-            polozenie.w_lewo()
+        while polozenie.nie_wychodzi_poza(self):
+            if self.pasuje_pozycja_symbol(*polozenie, symbol):
+                licznik += 1
+                polozenie.w_lewo()
+            else:
+                break
         if licznik >= 5:
             print('ma_uklad_wygrywajacy_poziom')
         return licznik >= 5
 
-    def zawiera_pozycje(self, pozycja):
-        return (pozycja[0] >= 0 and pozycja[0] < self.wierszy
-                and pozycja[1] >= 0 and pozycja[1] < self.kolumn)
 
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_pion(self, pozycja):
@@ -149,46 +158,29 @@ class Plansza:
         polozenie = Polozenie(*pozycja)
         symbol = pola.odczyt_pozycja(*pozycja)
         licznik = 0
-        nr_wiersza, nr_kolumny = pozycja
-        spr_wiersz = nr_wiersza
         #idź w dół
-        while (polozenie[wiersz] < self.wierszy
-               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
-            licznik += 1
-            polozenie.w_dol()
+        while polozenie.nie_wychodzi_poza(self):
+            if self.pasuje_pozycja_symbol(*polozenie, symbol):
+                licznik += 1
+                polozenie.w_dol()
+            else:
+                break
         #idź w górę
         polozenie = Polozenie(*pozycja)
         polozenie.w_gore()
-        while (polozenie[wiersz] >= 0
-               and self.pasuje_pozycja_symbol(*polozenie, symbol)):
-            licznik += 1
-            polozenie.w_gore()
+        while polozenie.nie_wychodzi_poza(self):
+            if self.pasuje_pozycja_symbol(*polozenie, symbol):
+               licznik += 1
+               polozenie.w_gore()
+            else:
+               break
         if licznik >= 5:
             print('ma_uklad_wygrywajacy_pion')
         return licznik >= 5
 
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
-        pola = self.pola
-        symbol = pola.odczyt_pozycja(*pozycja)
-        nr_wiersza, nr_kolumny = pozycja
-        spr_wiersz, spr_kolumna = nr_wiersza, nr_kolumny
-        licznik = 0
-        while (spr_wiersz < self.wierszy and
-               spr_kolumna < self.kolumn and
-               self.pasuje_pozycja_symbol(spr_wiersz, spr_kolumna, symbol)):
-            licznik += 1
-            spr_wiersz, spr_kolumna = spr_wiersz + 1, spr_kolumna + 1
-        #idź w górę
-        spr_wiersz, spr_kolumna = nr_wiersza - 1, nr_kolumny - 1
-        while (spr_wiersz >= 0 and spr_kolumna >= 0 and
-               self.pasuje_pozycja_symbol(spr_wiersz, nr_kolumny, symbol)):
-            licznik += 1
-            spr_wiersz -= 1
-            spr_kolumna -= 1
-        if licznik >= 5:
-            print('ma_uklad_wygrywajacy_ukos_lewy')
-        return licznik >= 5
+        pass
     
     def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
         pass
@@ -222,7 +214,8 @@ class Gracz_Czlowiek(Gracz):
         zla_pozycja = True
         while zla_pozycja:
             pozycja = odczyt_poz_myszy()
-            if plansza.zawiera_pozycje(pozycja):
+            polozenie = Polozenie(*pozycja)
+            if polozenie.nie_wychodzi_poza(plansza):
                 zla_pozycja = False
         return pozycja
             
