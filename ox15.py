@@ -113,70 +113,50 @@ class Plansza:
         pola = self.pola
         return pola.odczyt_pozycja(nr_wiersza, nr_kolumny) == symbol
 
-    def zliczaj_symbole_w_kierunku(self, polozenie, kierunek, licznik = 0):
+    def zliczaj_symbole_w_kierunku(self, symbol, polozenie,
+                                   kierunek, licznik):
         while polozenie.nie_wychodzi_poza(self):
             if self.pasuje_pozycja_symbol(*polozenie, symbol):
-                licznik += 1
+                licznik[0] += 1
                 kierunek()
             else:
                 break
 
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
-        kolumna = 1
-        wiersz = 0
-        pola = self.pola
         polozenie = Polozenie(*pozycja)
-        symbol = pola.odczyt_pozycja(*polozenie)
-        licznik = 0
+        symbol = self.pola.odczyt_pozycja(*polozenie)
+        licznik = [0]
         #idź w prawo
-        while polozenie.nie_wychodzi_poza(self):
-            if self.pasuje_pozycja_symbol(*polozenie, symbol):
-                licznik += 1
-                polozenie.w_prawo()
-            else:
-                break
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_prawo, licznik)
+        print('licznik = ', licznik)
         # bteraz w lewo
         polozenie = Polozenie(*pozycja)
         polozenie.w_lewo()
-        while polozenie.nie_wychodzi_poza(self):
-            if self.pasuje_pozycja_symbol(*polozenie, symbol):
-                licznik += 1
-                polozenie.w_lewo()
-            else:
-                break
-        if licznik >= 5:
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_prawo, licznik)
+        if licznik[0] >= 5:
             print('ma_uklad_wygrywajacy_poziom')
-        return licznik >= 5
+        return licznik[0] >= 5
 
 
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_pion(self, pozycja):
-        wiersz = 0
-        kolumna = 1
-        pola = self.pola
         polozenie = Polozenie(*pozycja)
-        symbol = pola.odczyt_pozycja(*pozycja)
-        licznik = 0
+        symbol = self.pola.odczyt_pozycja(*pozycja)
+        licznik = [0]
         #idź w dół
-        while polozenie.nie_wychodzi_poza(self):
-            if self.pasuje_pozycja_symbol(*polozenie, symbol):
-                licznik += 1
-                polozenie.w_dol()
-            else:
-                break
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_dol, licznik)
         #idź w górę
         polozenie = Polozenie(*pozycja)
         polozenie.w_gore()
-        while polozenie.nie_wychodzi_poza(self):
-            if self.pasuje_pozycja_symbol(*polozenie, symbol):
-               licznik += 1
-               polozenie.w_gore()
-            else:
-               break
-        if licznik >= 5:
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_gore, licznik)
+        if licznik[0] >= 5:
             print('ma_uklad_wygrywajacy_pion')
-        return licznik >= 5
+        return licznik[0] >= 5
 
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
