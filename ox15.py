@@ -43,21 +43,41 @@ class Polozenie(object):
     def __init__(self, wiersz, kolumna):
         self.poz = [wiersz, kolumna]
 
-    @pokaz_wywolanie
+    def __str__(self):
+        return str(self.poz)
+
     def w_lewo(self):
         self.poz[1] -= 1
 
-    @pokaz_wywolanie
     def w_prawo(self):
         self.poz[1] += 1
 
-    @pokaz_wywolanie
     def w_gore(self):
         self.poz[0] -= 1
 
-    @pokaz_wywolanie
+
     def w_dol(self):
         self.poz[0] += 1
+
+    @pokaz_wywolanie
+    def w_lewo_gore(self):
+        self.w_lewo()
+        self.w_gore()
+
+    @pokaz_wywolanie
+    def w_lewo_dol(self):
+        self.w_lewo()
+        self.w_dol()
+
+    @pokaz_wywolanie
+    def w_prawo_gore(self):
+        self.w_prawo()
+        self.w_gore()
+
+    @pokaz_wywolanie
+    def w_prawo_dol(self):
+        self.w_prawo()
+        self.w_dol()
 
     def __getitem__(self, key):
         return self.poz[key]
@@ -87,7 +107,6 @@ class Plansza:
         self.pola.zapis_pozycja(*poz, symbol)
         print(poz)
 
-    @pokaz_wywolanie
     def jest_zapelniona(self):
         zap = True
         def zajeta(nr_wiersza, nr_kolumny):
@@ -105,7 +124,8 @@ class Plansza:
         """
         pytania = []
         pytania.extend([self.ma_uklad_wygrywajacy_pion(pozycja),
-                        self.ma_uklad_wygrywajacy_poziom(pozycja)])
+                        self.ma_uklad_wygrywajacy_poziom(pozycja),
+                        self.ma_uklad_wygrywajacy_ukos_lewy(pozycja)])
         return any(pyt for pyt in pytania)
 
 
@@ -122,7 +142,6 @@ class Plansza:
             else:
                 break
 
-    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
         polozenie = Polozenie(*pozycja)
         symbol = self.pola.odczyt_pozycja(*polozenie)
@@ -130,18 +149,14 @@ class Plansza:
         #idź w prawo
         self.zliczaj_symbole_w_kierunku(symbol, polozenie,
                                         polozenie.w_prawo, licznik)
-        print('licznik = ', licznik)
         # bteraz w lewo
         polozenie = Polozenie(*pozycja)
         polozenie.w_lewo()
         self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                        polozenie.w_prawo, licznik)
-        if licznik[0] >= 5:
-            print('ma_uklad_wygrywajacy_poziom')
+                                        polozenie.w_lewo, licznik)
         return licznik[0] >= 5
 
 
-    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_pion(self, pozycja):
         polozenie = Polozenie(*pozycja)
         symbol = self.pola.odczyt_pozycja(*pozycja)
@@ -160,7 +175,20 @@ class Plansza:
 
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
-        pass
+        polozenie = Polozenie(*pozycja)
+        print(pozycja)
+        symbol = self.pola.odczyt_pozycja(*polozenie)
+        licznik = [0]
+        #idź lewo dół
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_prawo_dol, licznik)
+        #idź w lewo górę
+        polozenie = Polozenie(*pozycja)
+        polozenie.w_lewo_gore()
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_lewo_gore, licznik)
+        print('licznik = ', licznik)
+        return licznik[0] >= 5
     
     def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
         pass
