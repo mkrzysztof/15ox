@@ -125,9 +125,9 @@ class Plansza:
         pytania = []
         pytania.extend([self.ma_uklad_wygrywajacy_pion(pozycja),
                         self.ma_uklad_wygrywajacy_poziom(pozycja),
-                        self.ma_uklad_wygrywajacy_ukos_lewy(pozycja)])
+                        self.ma_uklad_wygrywajacy_ukos_lewy(pozycja),
+                        self.ma_uklad_wygrywajacy_ukos_prawy(pozycja)])
         return any(pyt for pyt in pytania)
-
 
     def pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
         pola = self.pola
@@ -176,7 +176,6 @@ class Plansza:
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
         polozenie = Polozenie(*pozycja)
-        print(pozycja)
         symbol = self.pola.odczyt_pozycja(*polozenie)
         licznik = [0]
         #idź lewo dół
@@ -187,12 +186,23 @@ class Plansza:
         polozenie.w_lewo_gore()
         self.zliczaj_symbole_w_kierunku(symbol, polozenie,
                                         polozenie.w_lewo_gore, licznik)
-        print('licznik = ', licznik)
         return licznik[0] >= 5
-    
+    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
-        pass
-
+        polozenie = Polozenie(*pozycja)
+        symbol = self.pola.odczyt_pozycja(*polozenie)
+        licznik = [0]
+        #idź w dół
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_lewo_dol, licznik)
+        print(licznik)
+        # idź w górę
+        polozenie = Polozenie(*pozycja)
+        polozenie.w_prawo_gore()
+        self.zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                        polozenie.w_prawo_gore, licznik)
+        print(licznik)
+        return licznik[0] >= 5
 
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
