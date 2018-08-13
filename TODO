@@ -3,3 +3,6 @@ rozpoznawanie ukośnych układów
 rozpoznawanie 4 a nie 5-ciu w jednej linii
 
 poziomy układ nie jest rozpoznawany przez właściwą funkcję
+
+zmienić klosę położenie na niemutowalną, operacje zmiany powodują zwrócenie
+nowego obiektu klasy Polozenie
