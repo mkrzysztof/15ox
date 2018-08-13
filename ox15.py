@@ -91,6 +91,12 @@ class Polozenie(object):
                and self[kolumna] >= 0
                and self[kolumna] < plansza.kolumn)
         return wyj
+
+    def jest_puste(self, plansza):
+        """ sprawdza czy polozenie na plansza jest puste """
+        wiersz = 0
+        kolumna = 1
+        return plansza.pola.odczyt_pozycja(*self) is None
     
 class Plansza:
     """reprentuje prostokątną planszę na której stawiane są kółka lub
@@ -228,12 +234,14 @@ class Gracz(object):
 
 class Gracz_Czlowiek(Gracz):
     """Klasa reprezentująca człowieka"""
+    @pokaz_wywolanie
     def wyszukaj_wolne_pole(self, plansza):
         zla_pozycja = True
         while zla_pozycja:
             pozycja = odczyt_poz_myszy()
             polozenie = Polozenie(*pozycja)
-            if polozenie.nie_wychodzi_poza(plansza):
+            if (polozenie.nie_wychodzi_poza(plansza)
+                and polozenie.jest_puste(plansza)):
                 zla_pozycja = False
         return pozycja
             
