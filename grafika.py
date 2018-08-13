@@ -66,6 +66,8 @@ def odczyt_poz_myszy():
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 wyj = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
     return poz_w
 
 
