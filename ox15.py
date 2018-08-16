@@ -14,9 +14,10 @@ class Symbol(object):
     repr_graf = None
 
     @classmethod
-    def postaw_na_planszy(cls, plansza, pozycja):
+    def postaw_na_planszy(cls, plansza, polozenie):
         """postaw na planszy symbol na pozycji"""
-        plansza.postaw_na_pozycji_symbol(pozycja, cls)
+        pozycja = tuple(polozenie)
+        plansza.zapis_polozenie(polozenie, cls)
         cls.repr_graf.rysuj_na_pozycji(pozycja, plansza.surface)
 
 
@@ -32,11 +33,13 @@ class Siatka:
     def __init__(self, wierszy=15, kolumn = 15):
         self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
 
-    def odczyt_pozycja(self, wiersz, kolumna):
+    def odczyt_polozenie(self, polozenie):
+        wiersz, kolumna = polozenie
         return self.pola[wiersz][kolumna]
 
-    def zapis_pozycja(self, wiersz, kolumna, sym):
-        self.pola[wiersz][kolumna] = sym
+    def zapis_polozenie(self, polozenie, symbol):
+        wiersz, kolumna = polozenie
+        self.pola[wiersz][kolumna] = symbol
     
 class Polozenie(object):
     """ pozycja """
@@ -96,28 +99,26 @@ class Polozenie(object):
         """ sprawdza czy polozenie na plansza jest puste """
         wiersz = 0
         kolumna = 1
-        return plansza.pola.odczyt_pozycja(*self) is None
+        return plansza.pola.odczyt_polozenie(self) is None
     
 class Plansza:
-    """reprentuje prostokątną planszę na której stawiane są kółka lub
-    krzyżyki
-    """
-
+    """ reprezentuje planszę na której rozgrywana jest gra: 
+    siatka gry + informacje"""
+    
     def __init__(self, surface, wierszy=15, kolumn=15):
         self.pola = Siatka(wierszy, kolumn)
         self.wierszy = wierszy
         self.kolumn = kolumn
         self.surface = surface
 
-    def postaw_na_pozycji_symbol(self, poz, symbol):
-        self.pola.zapis_pozycja(*poz, symbol)
-        print(poz)
+    def zapis_polozenie(self, polozenie, symbol):
+        self.pola.zapis_polozenie(polozenie, symbol)
 
     def jest_zapelniona(self):
         zap = True
         def zajeta(nr_wiersza, nr_kolumny):
             pola = self.pola
-            symbol = pola.odczyt_pozycja(nr_wiersza, nr_kolumny)
+            symbol = pola.odczyt_polozenie(Polozenie(nr_wiersza, nr_kolumny))
             return symbol is not None
         for nr_wiersza in range(self.wierszy):
             for nr_kolumny in range(self.kolumn):
@@ -128,16 +129,17 @@ class Plansza:
         """szukaj układu wygrywającego wokół pozycji pozycja,
         w 4 kierunkach
         """
-        pytania = []
-        pytania.extend([self.ma_uklad_wygrywajacy_pion(pozycja),
-                        self.ma_uklad_wygrywajacy_poziom(pozycja),
-                        self.ma_uklad_wygrywajacy_ukos_lewy(pozycja),
-                        self.ma_uklad_wygrywajacy_ukos_prawy(pozycja)])
-        return any(pyt for pyt in pytania)
+        if (self.ma_uklad_wygrywajacy_pion(pozycja)
+            or self.ma_uklad_wygrywajacy_poziom(pozycja)
+            or self.ma_uklad_wygrywajacy_ukos_lewy(pozycja)
+            or self.ma_uklad_wygrywajacy_ukos_prawy(pozycja)):
+            return True
+        else:
+            return False
 
     def pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
         pola = self.pola
-        return pola.odczyt_pozycja(nr_wiersza, nr_kolumny) == symbol
+        return pola.odczyt_polozenie(Polozenie(nr_wiersza, nr_kolumny)) == symbol
 
     def zliczaj_symbole_w_kierunku(self, symbol, polozenie,
                                    kierunek):
@@ -152,7 +154,7 @@ class Plansza:
 
     def ma_uklad_wygrywajacy_poziom(self, pozycja):
         polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_pozycja(*polozenie)
+        symbol = self.pola.odczyt_polozenie(polozenie)
         #idź w prawo
         licznik_prawo = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
                                                         polozenie.w_prawo)
@@ -166,7 +168,7 @@ class Plansza:
 
     def ma_uklad_wygrywajacy_pion(self, pozycja):
         polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_pozycja(*pozycja)
+        symbol = self.pola.odczyt_polozenie(polozenie)
         #idź w dół
         licznik_dol = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
                                                       polozenie.w_dol)
@@ -180,7 +182,7 @@ class Plansza:
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
         polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_pozycja(*polozenie)
+        symbol = self.pola.odczyt_polozenie(polozenie)
         #idź lewo dół
         licznik_dol = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
                                                       polozenie.w_prawo_dol)
@@ -194,7 +196,7 @@ class Plansza:
     @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
         polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_pozycja(*polozenie)
+        symbol = self.pola.odczyt_polozenie(polozenie)
         #idź w dół
         licznik_dol  = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
                                                        polozenie.w_lewo_dol)
@@ -219,7 +221,7 @@ class Gracz(object):
 
     def postaw_symbol_na_planszy(self, plansza):
         pozycja = self.wyszukaj_wolne_pole(plansza)
-        self.symbol.postaw_na_planszy(plansza, pozycja)
+        self.symbol.postaw_na_planszy(plansza, Polozenie(*pozycja))
         return pozycja
 
     def ustaw_wygrana(self):
