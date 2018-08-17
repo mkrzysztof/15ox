@@ -3,6 +3,10 @@
 from grafika import odczyt_poz_myszy, rysuj_siatke, Kolko_graf, Krzyzyk_graf
 import pygame
 
+#stałe
+wiersz = 0
+kolumna = 1
+
 def pokaz_wywolanie(f):
     def opakowanie(*args, **kwds):
         print('wywołuję: ', f.__name__)
@@ -50,37 +54,33 @@ class Polozenie(object):
         return str(self.poz)
 
     def w_lewo(self):
-        self.poz[1] -= 1
+        return Polozenie(self.poz[wiersz], self.poz[kolumna] - 1)
 
     def w_prawo(self):
-        self.poz[1] += 1
+        return Polozenie(self.poz[wiersz], self.poz[kolumna] + 1)
 
     def w_gore(self):
-        self.poz[0] -= 1
+        return Polozenie(self.poz[wiersz] - 1, self.poz[kolumna])
 
 
     def w_dol(self):
-        self.poz[0] += 1
+        return Polozenie(self.poz[wiersz] + 1, self.poz[kolumna])
 
     @pokaz_wywolanie
     def w_lewo_gore(self):
-        self.w_lewo()
-        self.w_gore()
+        return self.w_lewo().w_gore()
 
     @pokaz_wywolanie
     def w_lewo_dol(self):
-        self.w_lewo()
-        self.w_dol()
+        return self.w_lewo().w_dol()
 
     @pokaz_wywolanie
     def w_prawo_gore(self):
-        self.w_prawo()
-        self.w_gore()
+        return self.w_prawo().w_gore()
 
     @pokaz_wywolanie
     def w_prawo_dol(self):
-        self.w_prawo()
-        self.w_dol()
+        return self.w_prawo().w_dol()
 
     def __getitem__(self, key):
         return self.poz[key]
@@ -140,14 +140,25 @@ class Plansza:
     def pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
         pola = self.pola
         return pola.odczyt_polozenie(Polozenie(nr_wiersza, nr_kolumny)) == symbol
-
+    kierunki = {'w_lewo': Polozenie.w_lewo,
+                         'w_prawo': Polozenie.w_prawo,
+                         'w_dol' : Polozenie.w_dol,
+                         'w_gore': Polozenie.w_gore,
+                         'w_prawo_dol': Polozenie.w_prawo_dol,
+                         'w_lewo_gore': Polozenie.w_lewo_gore,
+                         'w_prawo_gore': Polozenie.w_prawo_gore,
+                         'w_lewo_dol': Polozenie.w_lewo_dol,
+                         }
+                         
+    
     def zliczaj_symbole_w_kierunku(self, symbol, polozenie,
                                    kierunek):
         licznik = 0
         while polozenie.nie_wychodzi_poza(self):
             if self.pasuje_pozycja_symbol(*polozenie, symbol):
                 licznik += 1
-                kierunek()
+                #kierunek()
+                polozenie = (Plansza.kierunki[kierunek])(polozenie)
             else:
                 break
         return licznik
@@ -157,12 +168,12 @@ class Plansza:
         symbol = self.pola.odczyt_polozenie(polozenie)
         #idź w prawo
         licznik_prawo = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                        polozenie.w_prawo)
+                                                        'w_prawo')
         # bteraz w lewo
         polozenie = Polozenie(*pozycja)
-        polozenie.w_lewo()
+        polozenie = polozenie.w_lewo()
         licznik_lewo = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       polozenie.w_lewo)
+                                                       'w_lewo')
         return (licznik_lewo + licznik_prawo) >= 5
 
 
@@ -171,12 +182,12 @@ class Plansza:
         symbol = self.pola.odczyt_polozenie(polozenie)
         #idź w dół
         licznik_dol = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                      polozenie.w_dol)
+                                                      'w_dol')
         #idź w górę
         polozenie = Polozenie(*pozycja)
-        polozenie.w_gore()
+        polozenie = polozenie.w_gore()
         licznik_gora = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       polozenie.w_gore)
+                                                       'w_gore')
         return (licznik_dol + licznik_gora) >= 5
 
     @pokaz_wywolanie
@@ -185,12 +196,12 @@ class Plansza:
         symbol = self.pola.odczyt_polozenie(polozenie)
         #idź lewo dół
         licznik_dol = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                      polozenie.w_prawo_dol)
+                                                      'w_prawo_dol')
         #idź w lewo górę
         polozenie = Polozenie(*pozycja)
-        polozenie.w_lewo_gore()
+        polozenie = polozenie.w_lewo_gore()
         licznik_gora = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       polozenie.w_lewo_gore)
+                                                       'w_lewo_gore')
         return (licznik_dol + licznik_gora) >= 5
     
     @pokaz_wywolanie
@@ -199,12 +210,12 @@ class Plansza:
         symbol = self.pola.odczyt_polozenie(polozenie)
         #idź w dół
         licznik_dol  = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       polozenie.w_lewo_dol)
+                                                       'w_lewo_dol')
         # idź w górę
         polozenie = Polozenie(*pozycja)
-        polozenie.w_prawo_gore()
+        polozenie = polozenie.w_prawo_gore()
         licznik_gora = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       polozenie.w_prawo_gore)
+                                                       'w_prawo_gore')
         return (licznik_dol + licznik_gora) >= 5
 
 class Gracz(object):
@@ -274,5 +285,4 @@ if __name__ == "__main__":
     rysuj_siatke(plansza_rozmiar, surface)
     gracz1 = Gracz_Czlowiek(Kolko)
     gracz2 = Gracz_Czlowiek(Krzyzyk)
-
     gra(gracz1, gracz2, plansza)
