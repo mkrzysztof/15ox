@@ -163,61 +163,34 @@ class Plansza:
                 break
         return licznik
 
-    def ma_uklad_wygrywajacy_poziom(self, pozycja):
+    def ma_uklad_wygrywajacy_w_kierunkach(self, pozycja, kierunek1, kierunek2):
         polozenie = Polozenie(*pozycja)
         symbol = self.pola.odczyt_polozenie(polozenie)
-        #idź w prawo
-        licznik_prawo = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                        'w_prawo')
-        # bteraz w lewo
+        #kierunek1
+        licznik1 = self.zliczaj_symbole_w_kierunku(symbol, polozenie, kierunek1)
+        #kierunek2
         polozenie = Polozenie(*pozycja)
-        polozenie = polozenie.w_lewo()
-        licznik_lewo = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       'w_lewo')
-        return (licznik_lewo + licznik_prawo) >= 5
+        polozenie = (Plansza.kierunki[kierunek2])(polozenie)
+        licznik2 = self.zliczaj_symbole_w_kierunku(symbol, polozenie, kierunek2)
+        return (licznik1 + licznik2) >= 5
 
+    def ma_uklad_wygrywajacy_poziom(self, pozycja):
+        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+                                                      'w_prawo', 'w_lewo')
 
     def ma_uklad_wygrywajacy_pion(self, pozycja):
-        polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_polozenie(polozenie)
-        #idź w dół
-        licznik_dol = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                      'w_dol')
-        #idź w górę
-        polozenie = Polozenie(*pozycja)
-        polozenie = polozenie.w_gore()
-        licznik_gora = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       'w_gore')
-        return (licznik_dol + licznik_gora) >= 5
-
-    @pokaz_wywolanie
+        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+                                                      'w_dol', 'w_gore')
     def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
-        polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_polozenie(polozenie)
-        #idź lewo dół
-        licznik_dol = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                      'w_prawo_dol')
-        #idź w lewo górę
-        polozenie = Polozenie(*pozycja)
-        polozenie = polozenie.w_lewo_gore()
-        licznik_gora = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       'w_lewo_gore')
-        return (licznik_dol + licznik_gora) >= 5
+        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+                                                      'w_prawo_dol',
+                                                      'w_lewo_gore')
     
-    @pokaz_wywolanie
     def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
-        polozenie = Polozenie(*pozycja)
-        symbol = self.pola.odczyt_polozenie(polozenie)
-        #idź w dół
-        licznik_dol  = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       'w_lewo_dol')
-        # idź w górę
-        polozenie = Polozenie(*pozycja)
-        polozenie = polozenie.w_prawo_gore()
-        licznik_gora = self.zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                       'w_prawo_gore')
-        return (licznik_dol + licznik_gora) >= 5
-
+        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+                                                      'w_lewo_dol',
+                                                      'w_prawo_gore')
+        
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
     def __init__(self, symbol):
