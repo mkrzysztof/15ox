@@ -48,7 +48,7 @@ class Siatka:
 class Polozenie(object):
     """ pozycja """
     def __init__(self, wiersz, kolumna):
-        self.poz = [wiersz, kolumna]
+        self.poz = (wiersz, kolumna)
 
     def __str__(self):
         return str(self.poz)
@@ -66,19 +66,15 @@ class Polozenie(object):
     def w_dol(self):
         return Polozenie(self.poz[wiersz] + 1, self.poz[kolumna])
 
-    @pokaz_wywolanie
     def w_lewo_gore(self):
         return self.w_lewo().w_gore()
 
-    @pokaz_wywolanie
     def w_lewo_dol(self):
         return self.w_lewo().w_dol()
 
-    @pokaz_wywolanie
     def w_prawo_gore(self):
         return self.w_prawo().w_gore()
 
-    @pokaz_wywolanie
     def w_prawo_dol(self):
         return self.w_prawo().w_dol()
 
@@ -129,65 +125,67 @@ class Plansza:
         """szukaj układu wygrywającego wokół pozycji pozycja,
         w 4 kierunkach
         """
-        if (self.ma_uklad_wygrywajacy_pion(pozycja)
-            or self.ma_uklad_wygrywajacy_poziom(pozycja)
-            or self.ma_uklad_wygrywajacy_ukos_lewy(pozycja)
-            or self.ma_uklad_wygrywajacy_ukos_prawy(pozycja)):
+        if (self.__ma_uklad_wygrywajacy_pion(pozycja)
+            or self.__ma_uklad_wygrywajacy_poziom(pozycja)
+            or self.__ma_uklad_wygrywajacy_ukos_lewy(pozycja)
+            or self.__ma_uklad_wygrywajacy_ukos_prawy(pozycja)):
             return True
         else:
             return False
 
-    def pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
+    def __pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
         pola = self.pola
         return pola.odczyt_polozenie(Polozenie(nr_wiersza, nr_kolumny)) == symbol
-    kierunki = {'w_lewo': Polozenie.w_lewo,
-                         'w_prawo': Polozenie.w_prawo,
-                         'w_dol' : Polozenie.w_dol,
-                         'w_gore': Polozenie.w_gore,
-                         'w_prawo_dol': Polozenie.w_prawo_dol,
-                         'w_lewo_gore': Polozenie.w_lewo_gore,
-                         'w_prawo_gore': Polozenie.w_prawo_gore,
-                         'w_lewo_dol': Polozenie.w_lewo_dol,
-                         }
+    __kierunki = {'w_lewo': Polozenie.w_lewo,
+                'w_prawo': Polozenie.w_prawo,
+                'w_dol' : Polozenie.w_dol,
+                'w_gore': Polozenie.w_gore,
+                'w_prawo_dol': Polozenie.w_prawo_dol,
+                'w_lewo_gore': Polozenie.w_lewo_gore,
+                'w_prawo_gore': Polozenie.w_prawo_gore,
+                'w_lewo_dol': Polozenie.w_lewo_dol,
+    }
                          
     
-    def zliczaj_symbole_w_kierunku(self, symbol, polozenie,
+    def __zliczaj_symbole_w_kierunku(self, symbol, polozenie,
                                    kierunek):
         licznik = 0
         while polozenie.nie_wychodzi_poza(self):
-            if self.pasuje_pozycja_symbol(*polozenie, symbol):
+            if self.__pasuje_pozycja_symbol(*polozenie, symbol):
                 licznik += 1
-                #kierunek()
-                polozenie = (Plansza.kierunki[kierunek])(polozenie)
+                polozenie = (Plansza.__kierunki[kierunek])(polozenie)
             else:
                 break
         return licznik
 
-    def ma_uklad_wygrywajacy_w_kierunkach(self, pozycja, kierunek1, kierunek2):
+    def __ma_uklad_wygrywajacy_w_kierunkach(self, pozycja,
+                                            kierunek1, kierunek2):
         polozenie = Polozenie(*pozycja)
         symbol = self.pola.odczyt_polozenie(polozenie)
         #kierunek1
-        licznik1 = self.zliczaj_symbole_w_kierunku(symbol, polozenie, kierunek1)
+        licznik1 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                                     kierunek1)
         #kierunek2
         polozenie = Polozenie(*pozycja)
-        polozenie = (Plansza.kierunki[kierunek2])(polozenie)
-        licznik2 = self.zliczaj_symbole_w_kierunku(symbol, polozenie, kierunek2)
+        polozenie = (Plansza.__kierunki[kierunek2])(polozenie)
+        licznik2 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                                     kierunek2)
         return (licznik1 + licznik2) >= 5
 
-    def ma_uklad_wygrywajacy_poziom(self, pozycja):
-        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+    def __ma_uklad_wygrywajacy_poziom(self, pozycja):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
                                                       'w_prawo', 'w_lewo')
 
-    def ma_uklad_wygrywajacy_pion(self, pozycja):
-        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+    def __ma_uklad_wygrywajacy_pion(self, pozycja):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
                                                       'w_dol', 'w_gore')
-    def ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
-        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+    def __ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
                                                       'w_prawo_dol',
                                                       'w_lewo_gore')
     
-    def ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
-        return self.ma_uklad_wygrywajacy_w_kierunkach(pozycja,
+    def __ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
                                                       'w_lewo_dol',
                                                       'w_prawo_gore')
         
@@ -215,7 +213,7 @@ class Gracz(object):
 
 class Gracz_Czlowiek(Gracz):
     """Klasa reprezentująca człowieka"""
-    @pokaz_wywolanie
+
     def wyszukaj_wolne_pole(self, plansza):
         zla_pozycja = True
         while zla_pozycja:
@@ -252,6 +250,7 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
             num_gracza = (num_gracza + 1) % 2
 
 if __name__ == "__main__":
+    pygame.init()
     surface = pygame.display.set_mode((800, 600))
     plansza = Plansza(surface)
     plansza_rozmiar = (15, 15)
