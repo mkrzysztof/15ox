@@ -4,13 +4,14 @@ from grafika import odczyt_poz_myszy, rysuj_siatke, Kolko_graf, Krzyzyk_graf
 import pygame
 
 #stałe
-wiersz = 0
-kolumna = 1
+WIERSZ = 0
+KOLUMNA = 1
 
-def pokaz_wywolanie(f):
+def pokaz_wywolanie(fun):
+    """raportuje wuwołanie funkcjii do adnotacji"""
     def opakowanie(*args, **kwds):
-        print('wywołuję: ', f.__name__)
-        return f(*args, **kwds)
+        print('wywołuję: ', fun.__name__)
+        return fun(*args, **kwds)
     return opakowanie
 
 class Symbol(object):
@@ -24,7 +25,6 @@ class Symbol(object):
         plansza.zapis_polozenie(polozenie, cls)
         cls.repr_graf.rysuj_na_pozycji(pozycja, plansza.surface)
 
-
 class Kolko(Symbol):
     """sybol kółka"""
     repr_graf = Kolko_graf()
@@ -34,19 +34,22 @@ class Krzyzyk(Symbol):
     repr_graf = Krzyzyk_graf()
 
 class Siatka:
-    def __init__(self, wierszy=15, kolumn = 15):
+    """reprezentuje siatkę na której gracze stawiają symbole"""
+    def __init__(self, wierszy=15, kolumn=15):
         self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
 
     def odczyt_polozenie(self, polozenie):
+        """odczytuje symbol z położenia"""
         wiersz, kolumna = polozenie
         return self.pola[wiersz][kolumna]
 
     def zapis_polozenie(self, polozenie, symbol):
+        """stawia symbol na położenie"""
         wiersz, kolumna = polozenie
         self.pola[wiersz][kolumna] = symbol
-    
+
 class Polozenie(object):
-    """ pozycja """
+    """reprezentuje położenie (wiersz, kolumna) """
     def __init__(self, wiersz, kolumna):
         self.poz = (wiersz, kolumna)
 
@@ -54,28 +57,36 @@ class Polozenie(object):
         return str(self.poz)
 
     def w_lewo(self):
-        return Polozenie(self.poz[wiersz], self.poz[kolumna] - 1)
+        """zwraca nowe położenie przesunięte w lewo"""
+        return Polozenie(self.poz[WIERSZ], self.poz[KOLUMNA] - 1)
 
     def w_prawo(self):
-        return Polozenie(self.poz[wiersz], self.poz[kolumna] + 1)
+        """zwraca nowe położenie przesunięte w prawo"""
+        return Polozenie(self.poz[WIERSZ], self.poz[KOLUMNA] + 1)
 
     def w_gore(self):
-        return Polozenie(self.poz[wiersz] - 1, self.poz[kolumna])
+        """zwraca nowe położenie przesunięte w górę"""
+        return Polozenie(self.poz[WIERSZ] - 1, self.poz[KOLUMNA])
 
 
     def w_dol(self):
-        return Polozenie(self.poz[wiersz] + 1, self.poz[kolumna])
+        """zwraca nowe położenie przesunięte w dół"""
+        return Polozenie(self.poz[WIERSZ] + 1, self.poz[KOLUMNA])
 
     def w_lewo_gore(self):
+        """zwraca nowe położenie przesunięte w lewo i w górę"""
         return self.w_lewo().w_gore()
 
     def w_lewo_dol(self):
+        """zwraca nowe położenie przesunięte w lewo i  w dół"""
         return self.w_lewo().w_dol()
 
     def w_prawo_gore(self):
+        """zwraca nowe położenie przesunięte w prawo i w górę"""
         return self.w_prawo().w_gore()
 
     def w_prawo_dol(self):
+        """zwraca nowe położenie przesunięte w prawo i w dół"""
         return self.w_prawo().w_dol()
 
     def __getitem__(self, key):
@@ -83,24 +94,20 @@ class Polozenie(object):
 
     def nie_wychodzi_poza(self, plansza):
         """ sprawdza xzy położenie wychodzi poza planszę """
-        wiersz = 0
-        kolumna = 1
-        wyj = (self[wiersz] >= 0
-               and self[wiersz] < plansza.wierszy
-               and self[kolumna] >= 0
-               and self[kolumna] < plansza.kolumn)
+        wyj = (self[WIERSZ] >= 0
+               and self[WIERSZ] < plansza.wierszy
+               and self[KOLUMNA] >= 0
+               and self[KOLUMNA] < plansza.kolumn)
         return wyj
 
     def jest_puste(self, plansza):
         """ sprawdza czy polozenie na plansza jest puste """
-        wiersz = 0
-        kolumna = 1
         return plansza.pola.odczyt_polozenie(self) is None
-    
+
 class Plansza:
-    """ reprezentuje planszę na której rozgrywana jest gra: 
+    """reprezentuje planszę na której rozgrywana jest gra:
     siatka gry + informacje"""
-    
+
     def __init__(self, surface, wierszy=15, kolumn=15):
         self.pola = Siatka(wierszy, kolumn)
         self.wierszy = wierszy
@@ -108,9 +115,11 @@ class Plansza:
         self.surface = surface
 
     def zapis_polozenie(self, polozenie, symbol):
+        """postawienie symbol na Plansza na polozenie"""
         self.pola.zapis_polozenie(polozenie, symbol)
 
     def jest_zapelniona(self):
+        """sprawdza czy plansza jest całkowicie wypełniona"""
         zap = True
         def zajeta(nr_wiersza, nr_kolumny):
             pola = self.pola
@@ -125,30 +134,25 @@ class Plansza:
         """szukaj układu wygrywającego wokół pozycji pozycja,
         w 4 kierunkach
         """
-        if (self.__ma_uklad_wygrywajacy_pion(pozycja)
-            or self.__ma_uklad_wygrywajacy_poziom(pozycja)
-            or self.__ma_uklad_wygrywajacy_ukos_lewy(pozycja)
-            or self.__ma_uklad_wygrywajacy_ukos_prawy(pozycja)):
-            return True
-        else:
-            return False
+        return (self.__ma_uklad_wygrywajacy_pion(pozycja)
+                or self.__ma_uklad_wygrywajacy_poziom(pozycja)
+                or self.__ma_uklad_wygrywajacy_ukos_lewy(pozycja)
+                or self.__ma_uklad_wygrywajacy_ukos_prawy(pozycja))
 
     def __pasuje_pozycja_symbol(self, nr_wiersza, nr_kolumny, symbol):
         pola = self.pola
         return pola.odczyt_polozenie(Polozenie(nr_wiersza, nr_kolumny)) == symbol
     __kierunki = {'w_lewo': Polozenie.w_lewo,
-                'w_prawo': Polozenie.w_prawo,
-                'w_dol' : Polozenie.w_dol,
-                'w_gore': Polozenie.w_gore,
-                'w_prawo_dol': Polozenie.w_prawo_dol,
-                'w_lewo_gore': Polozenie.w_lewo_gore,
-                'w_prawo_gore': Polozenie.w_prawo_gore,
-                'w_lewo_dol': Polozenie.w_lewo_dol,
-    }
-                         
-    
+                  'w_prawo': Polozenie.w_prawo,
+                  'w_dol' : Polozenie.w_dol,
+                  'w_gore': Polozenie.w_gore,
+                  'w_prawo_dol': Polozenie.w_prawo_dol,
+                  'w_lewo_gore': Polozenie.w_lewo_gore,
+                  'w_prawo_gore': Polozenie.w_prawo_gore,
+                  'w_lewo_dol': Polozenie.w_lewo_dol,}
+
     def __zliczaj_symbole_w_kierunku(self, symbol, polozenie,
-                                   kierunek):
+                                     kierunek):
         licznik = 0
         while polozenie.nie_wychodzi_poza(self):
             if self.__pasuje_pozycja_symbol(*polozenie, symbol):
@@ -174,27 +178,26 @@ class Plansza:
 
     def __ma_uklad_wygrywajacy_poziom(self, pozycja):
         return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
-                                                      'w_prawo', 'w_lewo')
+                                                        'w_prawo', 'w_lewo')
 
     def __ma_uklad_wygrywajacy_pion(self, pozycja):
         return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
-                                                      'w_dol', 'w_gore')
+                                                        'w_dol', 'w_gore')
     def __ma_uklad_wygrywajacy_ukos_lewy(self, pozycja):
         return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
-                                                      'w_prawo_dol',
-                                                      'w_lewo_gore')
-    
+                                                        'w_prawo_dol',
+                                                        'w_lewo_gore')
+
     def __ma_uklad_wygrywajacy_ukos_prawy(self, pozycja):
         return self.__ma_uklad_wygrywajacy_w_kierunkach(pozycja,
-                                                      'w_lewo_dol',
-                                                      'w_prawo_gore')
-        
+                                                        'w_lewo_dol',
+                                                        'w_prawo_gore')
+
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
     def __init__(self, symbol):
         self.symbol = symbol
         self.wygrana = False
-                                       
 
     def wyszukaj_wolne_pole(self, plansza):
         """metoda obstrakcyjna zwraca 2-kę reprezentującą położenie
@@ -211,7 +214,7 @@ class Gracz(object):
         print("wygrana")
 
 
-class Gracz_Czlowiek(Gracz):
+class GraczCzlowiek(Gracz):
     """Klasa reprezentująca człowieka"""
 
     def wyszukaj_wolne_pole(self, plansza):
@@ -220,22 +223,21 @@ class Gracz_Czlowiek(Gracz):
             pozycja = odczyt_poz_myszy()
             polozenie = Polozenie(*pozycja)
             if (polozenie.nie_wychodzi_poza(plansza)
-                and polozenie.jest_puste(plansza)):
+                    and polozenie.jest_puste(plansza)):
                 zla_pozycja = False
         return pozycja
-            
 
-class Gracz_komputer(Gracz):
+class GraczKomputer(Gracz):
+    """Klasa reprezentująca komputer"""
     pass
 
 def gra(pierwszy_gracz, drugi_gracz, plansza):
     """Główna procedura rozgrywki"""
-    "dopuki któryś z graczy nie wygra lub jest remis:\
-        bieżący gracz stawia swój symbol na wolnym polu planszsy\
-        jeżeli wykryrto układ wygrywający zgłoś wygraną bieżącego gracza\
-        w pp jeśli plansza zapełniona zgłoś remis\
-        w pp zmień bieżącego gracza\
-    "
+    # dopuki któryś z graczy nie wygra lub jest remis:\
+    # bieżący gracz stawia swój symbol na wolnym polu planszsy\
+    # jeżeli wykryrto układ wygrywający zgłoś wygraną bieżącego gracza\
+    # w pp jeśli plansza zapełniona zgłoś remis\
+    # w pp zmień bieżącego gracza
     remis = False
     gracze = (pierwszy_gracz, drugi_gracz)
     num_gracza = 0
@@ -251,10 +253,10 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
 
 if __name__ == "__main__":
     pygame.init()
-    surface = pygame.display.set_mode((800, 600))
-    plansza = Plansza(surface)
-    plansza_rozmiar = (15, 15)
-    rysuj_siatke(plansza_rozmiar, surface)
-    gracz1 = Gracz_Czlowiek(Kolko)
-    gracz2 = Gracz_Czlowiek(Krzyzyk)
-    gra(gracz1, gracz2, plansza)
+    SURFACE = pygame.display.set_mode((800, 600))
+    PLANSZA = Plansza(SURFACE)
+    PLANSZA_ROZMIAR = (15, 15)
+    rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
+    GRACZ1 = GraczCzlowiek(Kolko)
+    GRACZ2 = GraczCzlowiek(Krzyzyk)
+    gra(GRACZ1, GRACZ2, PLANSZA)
