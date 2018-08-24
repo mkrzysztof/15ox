@@ -1,4 +1,5 @@
 import  pygame
+import siatka
 
 pygame.init()
 
@@ -68,7 +69,7 @@ def odczyt_poz_myszy():
                 wyj = True
             if event.type == pygame.QUIT:
                 pygame.quit()
-    return poz_w
+    return siatka.Polozenie(*poz_w)
 
 
 if __name__ == "__main__":
