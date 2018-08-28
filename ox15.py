@@ -10,10 +10,10 @@ KOLUMNA = 1
 
 def pokaz_wywolanie(fun):
     """raportuje wuwołanie funkcjii do adnotacji"""
-    def opakowanie(*args, **kwds):
+    def __opakowanie(*args, **kwds):
         print('wywołuję: ', fun.__name__)
         return fun(*args, **kwds)
-    return opakowanie
+    return __opakowanie
 
 class Symbol(object):
     """klasa abstrakcyjna reprezentująca kółko lub krzyżykl"""
@@ -40,7 +40,7 @@ class Plansza:
     siatka gry + informacje"""
 
     def __init__(self, surface, wierszy=15, kolumn=15):
-        """ surface obiekt pygame.surface """ 
+        """ surface obiekt pygame.surface """
         self.pola = Siatka(wierszy, kolumn)
         self.wierszy = wierszy
         self.kolumn = kolumn
@@ -53,13 +53,13 @@ class Plansza:
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
         zap = True
-        def zajeta(polozenie):
+        def __zajeta(polozenie):
             pola = self.pola
             symbol = pola.odczyt_polozenie(polozenie)
             return symbol is not None
         for nr_wiersza in range(self.wierszy):
             for nr_kolumny in range(self.kolumn):
-                zap = zap  and zajeta(Polozenie(nr_wiersza, nr_kolumny))
+                zap = zap  and __zajeta(Polozenie(nr_wiersza, nr_kolumny))
         return zap
 
     def ma_uklad_wygrywajacy(self, polozenie):
@@ -74,7 +74,7 @@ class Plansza:
     def __pasuje_pozycja_symbol(self, polozenie, symbol):
         pola = self.pola
         return pola.odczyt_polozenie(polozenie) == symbol
-    
+
     __kierunki = {'w_lewo': Polozenie.w_lewo,
                   'w_prawo': Polozenie.w_prawo,
                   'w_dol' : Polozenie.w_dol,
