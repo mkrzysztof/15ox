@@ -78,7 +78,7 @@ class Siatka:
         wiersz, kolumna = polozenie
         self.pola[wiersz][kolumna] = symbol
 
-    def __zajete(self, polozenie):
+    def __zajeta(self, polozenie):
         symbol = self.odczyt_polozenie(polozenie)
         return symbol is not None
         
