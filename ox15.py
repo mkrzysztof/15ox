@@ -66,63 +66,7 @@ class Plansza:
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
         w 4 kierunkach
         """
-        return (self.__ma_uklad_wygrywajacy_pion(polozenie)
-                or self.__ma_uklad_wygrywajacy_poziom(polozenie)
-                or self.__ma_uklad_wygrywajacy_ukos_lewy(polozenie)
-                or self.__ma_uklad_wygrywajacy_ukos_prawy(polozenie))
-
-    def __pasuje_pozycja_symbol(self, polozenie, symbol):
-        pola = self.pola
-        return pola.odczyt_polozenie(polozenie) == symbol
-
-    __kierunki = {'w_lewo': Polozenie.w_lewo,
-                  'w_prawo': Polozenie.w_prawo,
-                  'w_dol' : Polozenie.w_dol,
-                  'w_gore': Polozenie.w_gore,
-                  'w_prawo_dol': Polozenie.w_prawo_dol,
-                  'w_lewo_gore': Polozenie.w_lewo_gore,
-                  'w_prawo_gore': Polozenie.w_prawo_gore,
-                  'w_lewo_dol': Polozenie.w_lewo_dol,}
-
-    def __zliczaj_symbole_w_kierunku(self, symbol, polozenie,
-                                     kierunek):
-        licznik = 0
-        while polozenie.nie_wychodzi_poza(self.pola):
-            if self.__pasuje_pozycja_symbol(polozenie, symbol):
-                licznik += 1
-                polozenie = (Plansza.__kierunki[kierunek])(polozenie)
-            else:
-                break
-        return licznik
-
-    def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
-                                            kierunek1, kierunek2):
-        symbol = self.pola.odczyt_polozenie(polozenie)
-        #kierunek1
-        licznik1 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                     kierunek1)
-        #kierunek2
-        polozenie = (Plansza.__kierunki[kierunek2])(polozenie)
-        licznik2 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
-                                                     kierunek2)
-        return (licznik1 + licznik2) >= 5
-
-    def __ma_uklad_wygrywajacy_poziom(self, polozenie):
-        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
-                                                        'w_prawo', 'w_lewo')
-
-    def __ma_uklad_wygrywajacy_pion(self, polozenie):
-        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
-                                                        'w_dol', 'w_gore')
-    def __ma_uklad_wygrywajacy_ukos_lewy(self, polozenie):
-        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
-                                                        'w_prawo_dol',
-                                                        'w_lewo_gore')
-
-    def __ma_uklad_wygrywajacy_ukos_prawy(self, polozenie):
-        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
-                                                        'w_lewo_dol',
-                                                        'w_prawo_gore')
+        return self.pola.ma_uklad_wygrywajacy(polozenie)
 
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""

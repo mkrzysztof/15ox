@@ -4,23 +4,6 @@
 WIERSZ = 0
 KOLUMNA = 1
 
-class Siatka:
-    """reprezentuje siatkę na której gracze stawiają symbole"""
-    def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
-        self.wierszy = wierszy
-        self.kolumn = kolumn
-
-    def odczyt_polozenie(self, polozenie):
-        """odczytuje symbol z położenia"""
-        wiersz, kolumna = polozenie
-        return self.pola[wiersz][kolumna]
-
-    def zapis_polozenie(self, polozenie, symbol):
-        """stawia symbol na położenie"""
-        wiersz, kolumna = polozenie
-        self.pola[wiersz][kolumna] = symbol
-
 class Polozenie(object):
     """reprezentuje położenie (wiersz, kolumna) """
     def __init__(self, wiersz, kolumna):
@@ -76,3 +59,83 @@ class Polozenie(object):
     def jest_puste(self, siatka):
         """ sprawdza czy polozenie na plansza jest puste """
         return siatka.odczyt_polozenie(self) is None
+
+class Siatka:
+    """reprezentuje siatkę na której gracze stawiają symbole"""
+    def __init__(self, wierszy=15, kolumn=15):
+        self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
+        self.wierszy = wierszy
+        self.kolumn = kolumn
+
+    def odczyt_polozenie(self, polozenie):
+        """odczytuje symbol z położenia"""
+        wiersz, kolumna = polozenie
+        return self.pola[wiersz][kolumna]
+
+    def zapis_polozenie(self, polozenie, symbol):
+        """stawia symbol na położenie"""
+        wiersz, kolumna = polozenie
+        self.pola[wiersz][kolumna] = symbol
+
+    def ma_uklad_wygrywajacy(self, polozenie):
+        """szukaj układu wygrywającego wok1ół pozycji pozycja,
+        w 4 kierunkach
+        """
+        return (self.__ma_uklad_wygrywajacy_pion(polozenie)
+                or self.__ma_uklad_wygrywajacy_poziom(polozenie)
+                or self.__ma_uklad_wygrywajacy_ukos_lewy(polozenie)
+                or self.__ma_uklad_wygrywajacy_ukos_prawy(polozenie))
+
+    def __pasuje_pozycja_symbol(self, polozenie, symbol):
+        return self.odczyt_polozenie(polozenie) == symbol
+
+    __kierunki = {'w_lewo': Polozenie.w_lewo,
+                  'w_prawo': Polozenie.w_prawo,
+                  'w_dol' : Polozenie.w_dol,
+                  'w_gore': Polozenie.w_gore,
+                  'w_prawo_dol': Polozenie.w_prawo_dol,
+                  'w_lewo_gore': Polozenie.w_lewo_gore,
+                  'w_prawo_gore': Polozenie.w_prawo_gore,
+                  'w_lewo_dol': Polozenie.w_lewo_dol,}
+
+    def __zliczaj_symbole_w_kierunku(self, symbol, polozenie,
+                                     kierunek):
+        licznik = 0
+        while polozenie.nie_wychodzi_poza(self):
+            if self.__pasuje_pozycja_symbol(polozenie, symbol):
+                licznik += 1
+                polozenie = (Siatka.__kierunki[kierunek])(polozenie)
+            else:
+                break
+        return licznik
+
+    def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
+                                            kierunek1, kierunek2):
+        symbol = self.odczyt_polozenie(polozenie)
+        #kierunek1
+        licznik1 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                                     kierunek1)
+        #kierunek2
+        polozenie = (Siatka.__kierunki[kierunek2])(polozenie)
+        licznik2 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
+                                                     kierunek2)
+        return (licznik1 + licznik2) >= 5
+
+    def __ma_uklad_wygrywajacy_poziom(self, polozenie):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
+                                                        'w_prawo', 'w_lewo')
+
+    def __ma_uklad_wygrywajacy_pion(self, polozenie):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
+                                                        'w_dol', 'w_gore')
+    def __ma_uklad_wygrywajacy_ukos_lewy(self, polozenie):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
+                                                        'w_prawo_dol',
+                                                        'w_lewo_gore')
+
+    def __ma_uklad_wygrywajacy_ukos_prawy(self, polozenie):
+        return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,
+                                                        'w_lewo_dol',
+                                                        'w_prawo_gore')
+
+
