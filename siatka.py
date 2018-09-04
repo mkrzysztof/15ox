@@ -1,4 +1,5 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
+import itertools
 
 #stałe
 WIERSZ = 0
@@ -77,6 +78,18 @@ class Siatka:
         wiersz, kolumna = polozenie
         self.pola[wiersz][kolumna] = symbol
 
+    def __zajete(self, polozenie):
+        symbol = self.odczyt_polozenie(polozenie)
+        return symbol is not None
+        
+    def jest_zapelniona(self):
+        """sprawdza czy plansza jest całkowicie wypełniona"""
+        zap = True
+        for nr_wiersza in range(self.wierszy):
+            for nr_kolumny in range(self.kolumn):
+                zap = zap  and self.__zajeta(Polozenie(nr_wiersza, nr_kolumny))
+        return zap
+
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
         w 4 kierunkach
@@ -85,6 +98,14 @@ class Siatka:
                 or self.__ma_uklad_wygrywajacy_poziom(polozenie)
                 or self.__ma_uklad_wygrywajacy_ukos_lewy(polozenie)
                 or self.__ma_uklad_wygrywajacy_ukos_prawy(polozenie))
+
+    def wolne_pola(self):
+        """ zwraca generator wolnych pól siatki"""
+        wszystkie = itertools.product(range(self.wierszy), range(self.kolumn))
+        for para in wszystkie:
+            ruch = Polozenie(*para)
+            if not self.__zajete(ruch):
+                yield ruch
 
     def __pasuje_pozycja_symbol(self, polozenie, symbol):
         return self.odczyt_polozenie(polozenie) == symbol

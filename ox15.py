@@ -51,16 +51,7 @@ class Plansza:
         self.pola.zapis_polozenie(polozenie, symbol)
 
     def jest_zapelniona(self):
-        """sprawdza czy plansza jest całkowicie wypełniona"""
-        zap = True
-        def __zajeta(polozenie):
-            pola = self.pola
-            symbol = pola.odczyt_polozenie(polozenie)
-            return symbol is not None
-        for nr_wiersza in range(self.wierszy):
-            for nr_kolumny in range(self.kolumn):
-                zap = zap  and __zajeta(Polozenie(nr_wiersza, nr_kolumny))
-        return zap
+        return self.pola.jest_zapelniona()
 
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
@@ -73,6 +64,8 @@ class Gracz(object):
     def __init__(self, symbol):
         self.symbol = symbol
         self.wygrana = False
+        self.mnoznik = 0
+        self.przeciwnik = None
 
     def wyszukaj_wolne_pole(self, plansza):
         """metoda obstrakcyjna zwraca siatka.Polozenie reprezentującą położenie
@@ -133,4 +126,6 @@ if __name__ == "__main__":
     rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
     GRACZ1 = GraczCzlowiek(Kolko)
     GRACZ2 = GraczCzlowiek(Krzyzyk)
+    GRACZ1.przeciwnik = GRACZ2
+    GRACZ2.przeciwnik = GRACZ1
     gra(GRACZ1, GRACZ2, PLANSZA)
