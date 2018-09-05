@@ -100,7 +100,7 @@ class Siatka:
                 or self.__ma_uklad_wygrywajacy_ukos_prawy(polozenie))
 
     def wolne_pola(self):
-        """ zwraca generator wolnych pól siatki"""
+        """ zwraca generator wolnych pól (Polozenie) siatki """
         wszystkie = itertools.product(range(self.wierszy), range(self.kolumn))
         for para in wszystkie:
             ruch = Polozenie(*para)
