@@ -1,5 +1,6 @@
 import  pygame
 import siatka
+import zarzadca
 
 pygame.init()
 
@@ -9,24 +10,33 @@ class Parametry:
 
 class Symbol_graf:
     """graficzna reprezentacja x lub o"""
-    font = pygame.font.SysFont("", 30)
-    sym = None
-    @classmethod
-    def rysuj_na_pozycji(cls, pozycja, surface):
+
+    def rysuj_na_pozycji(self, pozycja, surface):
         poz_x = Parametry.poczatek[1] + pozycja[1] * Parametry.wielkosc +\
             pozycja[1] + 1
         poz_y = Parametry.poczatek[0] + pozycja[0] * Parametry.wielkosc +\
             pozycja[0] + 1
-        surface.blit(cls.sym, (poz_x, poz_y))
+        surface.blit(self.sym, (poz_x, poz_y))
         pygame.display.flip()
-        
 
-class Kolko_graf(Symbol_graf):
-    sym = Symbol_graf.font.render('o', False, (0, 255, 0))
+    def fun_zwr(self, surface, param):
+        self.rysuj_na_pozycji(param, surface)
+    
+    def __init__(self):
+        self.font = pygame.font.SysFont("", 30)
+        self.sym = None
+        zarzadca.zarejestruj(self.__class__,self.fun_zwr)
+
+class Kolko_graf(Symbol_graf):    
+    def __init__(self):
+        super().__init__()
+        self.sym = self.font.render('o', False, (0, 255, 0))
+
 
 class Krzyzyk_graf(Symbol_graf):
-    sym = Symbol_graf.font.render('x', False, (0, 255, 0))
-
+    def __init__(self):
+        super().__init__()
+        self.sym = self.font.render('x', False, (0, 255, 0))
 
 class Puste_graf(Symbol_graf):
     pass

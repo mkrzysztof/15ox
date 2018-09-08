@@ -3,6 +3,7 @@
 from grafika import odczyt_poz_myszy, rysuj_siatke, Kolko_graf, Krzyzyk_graf
 import pygame
 from siatka import Siatka, Polozenie
+import zarzadca
 
 #stałe
 WIERSZ = 0
@@ -18,22 +19,24 @@ def pokaz_wywolanie(fun):
 class Symbol(object):
     """klasa abstrakcyjna reprezentująca kółko lub krzyżykl"""
     repr_graf = None
+    repr = None
 
     @classmethod
     def postaw_na_planszy(cls, plansza, polozenie):
         """postaw na planszy symbol na pozycji"""
         pozycja = tuple(polozenie)
         plansza.zapis_polozenie(polozenie, cls)
-        cls.repr_graf.rysuj_na_pozycji(pozycja, plansza.surface)
+        zarzadca.rozeslij(pozycja, plansza.surface, cls.repr_graf)
 
 class Kolko(Symbol):
     """sybol kółka"""
     repr_graf = Kolko_graf()
+    repr = "Kolko"
 
 class Krzyzyk(Symbol):
     """symbol krzyżyk"""
     repr_graf = Krzyzyk_graf()
-
+    repr = "Krzyzyk"
 
 class Plansza:
     """reprezentuje planszę na której rozgrywana jest gra:
