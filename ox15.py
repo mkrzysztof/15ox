@@ -1,14 +1,9 @@
 """Gra"""
-#import renderowanie
-from grafika import odczyt_poz_myszy, rysuj_siatke, Kolko_graf, Krzyzyk_graf
 import pygame
-from siatka import Polozenie
-import zarzadca
 import plansza
-
-#stałe
-WIERSZ = 0
-KOLUMNA = 1
+import symbol
+import gracz
+import grafika
 
 def pokaz_wywolanie(fun):
     """raportuje wuwołanie funkcjii do adnotacji"""
@@ -16,67 +11,6 @@ def pokaz_wywolanie(fun):
         print('wywołuję: ', fun.__name__)
         return fun(*args, **kwds)
     return __opakowanie
-
-class Symbol(object):
-    """klasa abstrakcyjna reprezentująca kółko lub krzyżykl"""
-    repr_graf = None
-    repr = None
-
-    @classmethod
-    def postaw_na_planszy(cls, plansza, polozenie):
-        """postaw na planszy symbol na pozycji"""
-        pozycja = tuple(polozenie)
-        plansza.zapis_polozenie(polozenie, cls)
-        zarzadca.rozeslij(pozycja, plansza.surface, cls.repr_graf)
-
-class Kolko(Symbol):
-    """sybol kółka"""
-    repr_graf = Kolko_graf()
-    repr = "Kolko"
-
-class Krzyzyk(Symbol):
-    """symbol krzyżyk"""
-    repr_graf = Krzyzyk_graf()
-    repr = "Krzyzyk"
-
-class Gracz(object):
-    """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
-    def __init__(self, symbol):
-        self.symbol = symbol
-        self.wygrana = False
-        self.mnoznik = 0
-        self.przeciwnik = None
-
-    def wyszukaj_wolne_pole(self, plansza):
-        """metoda obstrakcyjna zwraca siatka.Polozenie reprezentującą położenie
-        na polu planszy """
-        pass
-
-    def postaw_symbol_na_planszy(self, plansza):
-        polozenie = self.wyszukaj_wolne_pole(plansza)
-        self.symbol.postaw_na_planszy(plansza, polozenie)
-        return polozenie
-
-    def ustaw_wygrana(self):
-        self.wygrana = True
-        print("wygrana")
-
-
-class GraczCzlowiek(Gracz):
-    """Klasa reprezentująca człowieka"""
-
-    def wyszukaj_wolne_pole(self, plansza):
-        zla_pozycja = True
-        while zla_pozycja:
-            polozenie = odczyt_poz_myszy()
-            if (polozenie.nie_wychodzi_poza(plansza.pola)
-                    and polozenie.jest_puste(plansza.pola)):
-                zla_pozycja = False
-        return polozenie
-
-class GraczKomputer(Gracz):
-    """Klasa reprezentująca komputer"""
-    pass
 
 def gra(pierwszy_gracz, drugi_gracz, plansza):
     """Główna procedura rozgrywki"""
@@ -99,13 +33,12 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
             num_gracza = (num_gracza + 1) % 2
 
 if __name__ == "__main__":
-    pygame.init()
     SURFACE = pygame.display.set_mode((800, 600))
     PLANSZA = plansza.Plansza(SURFACE)
     PLANSZA_ROZMIAR = (15, 15)
-    rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
-    GRACZ1 = GraczCzlowiek(Kolko)
-    GRACZ2 = GraczCzlowiek(Krzyzyk)
+    grafika.rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
+    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko)
+    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk)
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
     gra(GRACZ1, GRACZ2, PLANSZA)
