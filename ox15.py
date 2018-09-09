@@ -2,8 +2,9 @@
 #import renderowanie
 from grafika import odczyt_poz_myszy, rysuj_siatke, Kolko_graf, Krzyzyk_graf
 import pygame
-from siatka import Siatka, Polozenie
+from siatka import Polozenie
 import zarzadca
+import plansza
 
 #stałe
 WIERSZ = 0
@@ -37,30 +38,6 @@ class Krzyzyk(Symbol):
     """symbol krzyżyk"""
     repr_graf = Krzyzyk_graf()
     repr = "Krzyzyk"
-
-class Plansza:
-    """reprezentuje planszę na której rozgrywana jest gra:
-    siatka gry + informacje"""
-
-    def __init__(self, surface, wierszy=15, kolumn=15):
-        """ surface obiekt pygame.surface """
-        self.pola = Siatka(wierszy, kolumn)
-        self.wierszy = wierszy
-        self.kolumn = kolumn
-        self.surface = surface
-
-    def zapis_polozenie(self, polozenie, symbol):
-        """postawienie symbol na Plansza na polozenie"""
-        self.pola.zapis_polozenie(polozenie, symbol)
-
-    def jest_zapelniona(self):
-        return self.pola.jest_zapelniona()
-
-    def ma_uklad_wygrywajacy(self, polozenie):
-        """szukaj układu wygrywającego wok1ół pozycji pozycja,
-        w 4 kierunkach
-        """
-        return self.pola.ma_uklad_wygrywajacy(polozenie)
 
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
@@ -124,7 +101,7 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
 if __name__ == "__main__":
     pygame.init()
     SURFACE = pygame.display.set_mode((800, 600))
-    PLANSZA = Plansza(SURFACE)
+    PLANSZA = plansza.Plansza(SURFACE)
     PLANSZA_ROZMIAR = (15, 15)
     rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
     GRACZ1 = GraczCzlowiek(Kolko)
