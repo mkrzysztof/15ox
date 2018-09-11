@@ -2,19 +2,44 @@ import drzewo
 import siatka
 import gracz
 import sys
-
+import copy
 
 def buduj_drzewo(stan_siatki, ostatni_ruch, gracz_aktywny):
     przeciwnik = gracz_aktywny.przeciwnik
-    wierz_wyj = drzewo.Wierzcholek(stan_siatki, przeciwnik)
-    if stan_siatki.jest_zapelniona:
-        wierz_wyj.wartosc = 0
-    elif stan_siatki.ma_uklad_wygrywajacy(ostatni_ruch):
-        wierz_wyj.wartosc = przeciwnik.mnoznik
-    else:
-        for ruch in stan_siatki.wolne_pola():
-            nastepna_siatka = copy.copy(stan_siatki)
-            nastepna_siatka.zapis_polozenie(ruch, gracz_aktywny.symbol)
-            poddrzewo = buduj_drzewo(nastepna_siatka, ruch, przeciwnik)
-            wierz_wyj[ruch] = poddrzewo
-    return wierz_wyj
+    wierzch_wyj = drzewo.Wierzcholek(stan_siatki, przeciwnik)
+    stos = []
+    element = (wierzch_wyj, ostatni_ruch)
+    stos.append(element)
+    while len(stos) != 0:
+        wierzcholek, ruch = stos.pop()
+        siatka = wierzcholek.siatka
+        gracz = wierzcholek.gracz
+        if siatka.jest_zapelniona():
+            wierzcholek.wartosc = 0
+        elif siatka.ma_uklad_wygrywajacy(ruch):
+            wierzcholek.wartosc = gracz.mnoznik
+        else:
+            for ruch in siatka.wolne_pola():
+                nastepna_siatka = copy.copy(siatka)
+                nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik)
+                pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, gracz)
+                wierzcholek.dodaj(ruch, pod_wierzcholek)
+                element = (pod_wierzcholek, ruch)
+                stos.append(element)
+    return wierzch_wyj
+
+def min_max(wierzcholek, gracz_aktywny):
+    wartosc = wierzcholek.wartosc
+    ruch = None
+    if wartosc is None:
+        wartosci = {}
+        for ruch in wierzcholek.keys():
+            dziecko = wierzcholek.odczytaj(ruch)
+            dziecko.wartosc = min_max(dziecko, gracz_aktywny)[1]
+            wartosci[ruch] = dziecko.wartosc
+        if wierzcholek.gracz != gracz_aktywny:
+            ruch, wartosc = max(wartosci.items(), key = lambda x: x[1])
+        else:
+            ruch, wartosc = min(wartosci.items(), key = lambda x: x[1])
+        wierzcholek.wartosc = wartosc
+    return (ruch, wartosc)

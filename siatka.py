@@ -104,7 +104,7 @@ class Siatka:
         wszystkie = itertools.product(range(self.wierszy), range(self.kolumn))
         for para in wszystkie:
             ruch = Polozenie(*para)
-            if not self.__zajete(ruch):
+            if not self.__zajeta(ruch):
                 yield ruch
 
     def __pasuje_pozycja_symbol(self, polozenie, symbol):

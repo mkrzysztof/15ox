@@ -6,10 +6,10 @@ class Wierzcholek:
         self.wartosc = None
         self.__dzieci = {}
 
-    def __setattr__(self, klucz, wierzcholek):
+    def dodaj(self, klucz, wierzcholek):
         self.__dzieci[klucz] = wierzcholek
 
-    def __getattr__(self, klucz):
+    def odczytaj(self, klucz):
         return self.__dzieci[klucz]
 
     def keys(self):
