@@ -9,7 +9,7 @@ gracz1.przeciwnik = gracz2
 gracz2.przeciwnik = gracz1
 gracz1.mnoznik = 1
 gracz2.mnoznik = -1
-siatka_poczatkowa = siatka.Siatka(10, 10)
+siatka_poczatkowa = siatka.Siatka(6, 6)
 ruchy = [(siatka.Polozenie(0, 0), 'o'), (siatka.Polozenie(1, 0), 'x'),
          (siatka.Polozenie(0, 1), 'o'), (siatka.Polozenie(2, 0), 'x'),
          (siatka.Polozenie(1, 1), 'o'), (siatka.Polozenie(1, 3), 'x'),]
