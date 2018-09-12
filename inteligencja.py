@@ -11,21 +11,27 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
     stos.append(element)
     while len(stos) != 0:
         wierzcholek, ruch = stos.pop()
-        siatka = wierzcholek.siatka
+        siatka = copy.deepcopy(wierzcholek.siatka)
         gracz = wierzcholek.gracz
         if siatka.jest_zapelniona():
             wierzcholek.wartosc = 0
+            wolne_pola = []
         elif ruch is not None:
             if siatka.ma_uklad_wygrywajacy(ruch):
                 wierzcholek.wartosc = gracz.mnoznik
+                wolne_pola = []
+            else:
+                wolne_pola = siatka.wolne_pola()
         else:
-            for ruch in siatka.wolne_pola():
-                nastepna_siatka = copy.copy(siatka)
-                nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik)
-                pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, gracz)
-                wierzcholek.dodaj(ruch, pod_wierzcholek)
-                element = (pod_wierzcholek, ruch)
-                stos.append(element)
+            wolne_pola = siatka.wolne_pola()
+        print("wolne pola", wolne_pola)
+        for ruch in wolne_pola:
+            nastepna_siatka = copy.deepcopy(siatka)
+            nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik)
+            pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, gracz)
+            wierzcholek.dodaj(ruch, pod_wierzcholek)
+            element = (pod_wierzcholek, ruch)
+            stos.append(element)
     return wierzch_wyj
 
 def min_max(wierzcholek, gracz_aktywny):
