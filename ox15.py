@@ -4,13 +4,8 @@ import plansza
 import symbol
 import gracz
 import grafika
-
-def pokaz_wywolanie(fun):
-    """raportuje wuwołanie funkcjii do adnotacji"""
-    def __opakowanie(*args, **kwds):
-        print('wywołuję: ', fun.__name__)
-        return fun(*args, **kwds)
-    return __opakowanie
+import gracz_komputer
+from monitoring import pokaz_wywolanie
 
 def gra(pierwszy_gracz, drugi_gracz, plansza):
     """Główna procedura rozgrywki"""
@@ -29,6 +24,7 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
             biezacy_gracz.ustaw_wygrana()
         elif plansza.jest_zapelniona():
             remis = True
+            print("Remis")
         else:
             num_gracza = (num_gracza + 1) % 2
 
@@ -38,7 +34,9 @@ if __name__ == "__main__":
     PLANSZA_ROZMIAR = (15, 15)
     grafika.rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
     GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko)
-    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk)
+    GRACZ2 = gracz_komputer.GraczKomputer(symbol.Krzyzyk)
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
+    GRACZ2.mnoznik = -1
+    GRACZ2.mnoznik = 1
     gra(GRACZ1, GRACZ2, PLANSZA)

@@ -35,6 +35,3 @@ class GraczCzlowiek(Gracz):
                 zla_pozycja = False
         return polozenie
 
-class GraczKomputer(Gracz):
-    """Klasa reprezentująca komputer"""
-    pass

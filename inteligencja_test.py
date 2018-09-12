@@ -18,5 +18,5 @@ for r, sym in ruchy:
 
 ostatni_ruch = ruchy[-1][0]
 
-drzewo = inteligencja.buduj_drzewo(siatka_poczatkowa, ostatni_ruch, gracz1)
+drzewo = inteligencja.buduj_drzewo(siatka_poczatkowa, gracz1)
 k, l = inteligencja.min_max(drzewo, gracz1)
