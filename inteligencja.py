@@ -14,7 +14,8 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
         wierzcholek, ruch, glebokosc = stos.pop()
         print("glebokosc ", glebokosc)
         glebokosc += 1
-        siatka = copy.deepcopy(wierzcholek.siatka)
+        #siatka = copy.deepcopy(wierzcholek.siatka)
+        siatka = wierzcholek.siatka.copy()
         gracz = wierzcholek.gracz
         if siatka.jest_zapelniona():
             wierzcholek.wartosc = 0

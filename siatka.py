@@ -1,5 +1,6 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
 import itertools
+import copy
 
 #stałe
 WIERSZ = 0
@@ -67,6 +68,12 @@ class Siatka:
         self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
+
+    def copy(self):
+        """kopia ale tylko pola pola"""
+        wyjscie = copy.copy(self)
+        wyjscie.pola = copy.copy(self.pola)
+        return wyjscie
 
     def odczyt_polozenie(self, polozenie):
         """odczytuje symbol z położenia"""
