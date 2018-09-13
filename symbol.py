@@ -17,9 +17,9 @@ class Symbol(object):
 class Kolko(Symbol):
     """sybol kółka"""
     repr_graf = grafika.Kolko_graf()
-    repr = "Kolko"
+    repr = "o"
 
 class Krzyzyk(Symbol):
     """symbol krzyżyk"""
     repr_graf = grafika.Krzyzyk_graf()
-    repr = "Krzyzyk"
+    repr = "x"

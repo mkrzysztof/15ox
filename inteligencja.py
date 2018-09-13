@@ -12,10 +12,8 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
     stos.append(element)
     while len(stos) != 0:
         wierzcholek, ruch, glebokosc = stos.pop()
-        print("glebokosc ", glebokosc)
         glebokosc += 1
-        #siatka = copy.deepcopy(wierzcholek.siatka)
-        siatka = wierzcholek.siatka.copy()
+        siatka = copy.deepcopy(wierzcholek.siatka)
         gracz = wierzcholek.gracz
         if siatka.jest_zapelniona():
             wierzcholek.wartosc = 0
@@ -23,6 +21,8 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
         elif ruch is not None:
             if siatka.ma_uklad_wygrywajacy(ruch):
                 wierzcholek.wartosc = gracz.mnoznik
+                print("układ wygrywający dla", gracz.symbol,
+                      wierzcholek.wartosc, sep=', ')
                 wolne_pola = []
             else:
                 wolne_pola = siatka.wolne_pola()
@@ -30,8 +30,10 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
             wolne_pola = siatka.wolne_pola()
         for ruch in wolne_pola:
             nastepna_siatka = copy.deepcopy(siatka)
-            nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik)
-            pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, gracz)
+            nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik.symbol)
+            print("następna siatka", nastepna_siatka, sep="\n")
+            pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka,
+                                                 gracz.przeciwnik)
             wierzcholek.dodaj(ruch, pod_wierzcholek)
             element = (pod_wierzcholek, ruch, glebokosc)
             stos.append(element)

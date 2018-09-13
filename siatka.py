@@ -5,6 +5,7 @@ import copy
 #stałe
 WIERSZ = 0
 KOLUMNA = 1
+_wygrywajacych = 3
 
 class Polozenie(object):
     """reprezentuje położenie (wiersz, kolumna) """
@@ -68,6 +69,19 @@ class Siatka:
         self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
+
+    def __repr__(self):
+        repr = ""
+        for w in range(self.wierszy):
+            for k in range(self.kolumn):
+                znak = self.odczyt_polozenie(Polozenie(w, k))
+                if znak is None:
+                    znak="."
+                else:
+                    znak = znak.repr
+                repr = repr + znak
+            repr = repr + "\n"
+        return repr
 
     def copy(self):
         """kopia ale tylko pola pola"""
@@ -147,7 +161,7 @@ class Siatka:
         polozenie = (Siatka.__kierunki[kierunek2])(polozenie)
         licznik2 = self.__zliczaj_symbole_w_kierunku(symbol, polozenie,
                                                      kierunek2)
-        return (licznik1 + licznik2) >= 5
+        return (licznik1 + licznik2) >= 3
 
     def __ma_uklad_wygrywajacy_poziom(self, polozenie):
         return self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie,

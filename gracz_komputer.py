@@ -9,6 +9,8 @@ class GraczKomputer(gracz.Gracz):
     @pokaz_wywolanie
     def wyszukaj_wolne_pole(self, siatka):
         siatka_kopia = copy.deepcopy(siatka)
+        self.mnoznik = 1
+        self.przeciwnik.mnoznik = - 1
         drzewo_decyzji = inteligencja.buduj_drzewo(siatka_kopia, self)
         ruch, wartosc = inteligencja.min_max(drzewo_decyzji, self)
         return ruch

@@ -22,6 +22,7 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
         if plansza.ma_uklad_wygrywajacy(polozenie):
             biezacy_gracz.ustaw_wygrana()
+            print(plansza.pola)
         elif plansza.jest_zapelniona():
             remis = True
             print("Remis")
@@ -30,13 +31,11 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
 
 if __name__ == "__main__":
     SURFACE = pygame.display.set_mode((800, 600))
-    PLANSZA = plansza.Plansza(SURFACE)
-    PLANSZA_ROZMIAR = (15, 15)
+    PLANSZA_ROZMIAR = (3, 3)
+    PLANSZA = plansza.Plansza(SURFACE, *PLANSZA_ROZMIAR)
     grafika.rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
     GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko)
     GRACZ2 = gracz_komputer.GraczKomputer(symbol.Krzyzyk)
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
-    GRACZ2.mnoznik = -1
-    GRACZ2.mnoznik = 1
     gra(GRACZ1, GRACZ2, PLANSZA)
