@@ -1,6 +1,7 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
 import itertools
 import copy
+from symbol import Puste
 
 #stałe
 WIERSZ = 0
@@ -61,27 +62,26 @@ class Polozenie(object):
 
     def jest_puste(self, siatka):
         """ sprawdza czy polozenie na plansza jest puste """
-        return siatka.odczyt_polozenie(self) is None
+        return siatka.odczyt_polozenie(self) == Puste
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
     def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[None for x in range(kolumn)] for y in range(wierszy)]
+        self.pola = [[Puste for x in range(kolumn)] for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
 
+
+    def __repr_wiersz(self, w):
+        return [self.odczyt_polozenie(Polozenie(w, k)).repr
+                 for k in range(self.kolumn)]
+
     def __repr__(self):
-        repr = ""
+        repr = []
         for w in range(self.wierszy):
-            for k in range(self.kolumn):
-                znak = self.odczyt_polozenie(Polozenie(w, k))
-                if znak is None:
-                    znak="."
-                else:
-                    znak = znak.repr
-                repr = repr + znak
-            repr = repr + "\n"
-        return repr
+            repr.extend(self.__repr_wiersz(w))
+            repr.append("\n")
+        return "".join(repr)
 
     def copy(self):
         """kopia ale tylko pola pola"""
@@ -101,7 +101,7 @@ class Siatka:
 
     def __zajeta(self, polozenie):
         symbol = self.odczyt_polozenie(polozenie)
-        return symbol is not None
+        return symbol != Puste
         
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""

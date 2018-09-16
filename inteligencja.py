@@ -23,6 +23,8 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
                 wierzcholek.wartosc = gracz.mnoznik
                 print("układ wygrywający dla", gracz.symbol,
                       wierzcholek.wartosc, sep=', ')
+                print(siatka)
+                print("__________")
                 wolne_pola = []
             else:
                 wolne_pola = siatka.wolne_pola()

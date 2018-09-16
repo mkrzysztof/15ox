@@ -23,3 +23,7 @@ class Krzyzyk(Symbol):
     """symbol krzyżyk"""
     repr_graf = grafika.Krzyzyk_graf()
     repr = "x"
+
+class Puste(Symbol):
+    """pusty"""
+    repr = "."
