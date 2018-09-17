@@ -1,7 +1,7 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
 import itertools
 import copy
-from symbol import Puste
+import symbol
 
 #stałe
 WIERSZ = 0
@@ -62,12 +62,12 @@ class Polozenie(object):
 
     def jest_puste(self, siatka):
         """ sprawdza czy polozenie na plansza jest puste """
-        return siatka.odczyt_polozenie(self) == Puste
+        return siatka.odczyt_polozenie(self) == symbol.Puste
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
     def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[Puste for x in range(kolumn)] for y in range(wierszy)]
+        self.pola = [[symbol.Puste for x in range(kolumn)] for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
 
@@ -83,10 +83,34 @@ class Siatka:
             repr.append("\n")
         return "".join(repr)
 
+
+    def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
+        repr = []
+        slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko,
+                   '.': symbol.Puste}
+        for sym in linia:
+            repr.append(slownik[sym])
+        self.pola[numer_wiersza] = repr
+    
+    def wypelnij_siatke(self, wzor):
+        """ wypełnij siatkę podanym wzorem:
+        [
+         'xo.xo.',
+         'o...x.',
+            .
+            .
+         'xxxxo.',
+        ]
+        gdzie kropka oznacza puste miejsce, wzór powinien być tak dobrany
+        by pasował do rozmiarów siatki
+        """
+        for numer, linia in enumerate(wzor):
+            self._wczytaj_linie_na_wiersz(linia, numer)
+
     def copy(self):
         """kopia ale tylko pola pola"""
         wyjscie = copy.copy(self)
-        wyjscie.pola = copy.copy(self.pola)
+        wyjscie.pola = copy.deepcopy(self.pola)
         return wyjscie
 
     def odczyt_polozenie(self, polozenie):
@@ -100,8 +124,8 @@ class Siatka:
         self.pola[wiersz][kolumna] = symbol
 
     def __zajeta(self, polozenie):
-        symbol = self.odczyt_polozenie(polozenie)
-        return symbol != Puste
+        odczytany_symbol = self.odczyt_polozenie(polozenie)
+        return odczytany_symbol != symbol.Puste
         
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
