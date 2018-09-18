@@ -66,7 +66,7 @@ class Polozenie(object):
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
     def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[symbol.Puste for x in range(kolumn)] for y in range(wierszy)]
+        self.pola = [[symbol.Puste] * kolumn for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
 
@@ -115,34 +115,45 @@ class Siatka:
 
     def odczyt_polozenie(self, polozenie):
         """odczytuje symbol z położenia"""
-        wiersz, kolumna = polozenie
-        return self.pola[wiersz][kolumna]
+        return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
 
     def zapis_polozenie(self, polozenie, symbol):
         """stawia symbol na położenie"""
-        wiersz, kolumna = polozenie
-        self.pola[wiersz][kolumna] = symbol
+        self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol
 
     def __zajeta(self, polozenie):
         odczytany_symbol = self.odczyt_polozenie(polozenie)
         return odczytany_symbol != symbol.Puste
-        
+
+    def _wiersz_jest_zapelniony(wiersz):
+        zap = True
+        for s in wiersz:
+            zap = zap and (s != symbol.Puste)
+            if not zap: break
+        return zap
+
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
         zap = True
-        for nr_wiersza in range(self.wierszy):
-            for nr_kolumny in range(self.kolumn):
-                zap = zap  and self.__zajeta(Polozenie(nr_wiersza, nr_kolumny))
+        for wiersz in self.pola:
+            zap = zap and (Siatka._wiersz_jest_zapelniony(wiersz))
+            if not zap: break
         return zap
 
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
         w 4 kierunkach
         """
-        return (self.__ma_uklad_wygrywajacy_pion(polozenie)
-                or self.__ma_uklad_wygrywajacy_poziom(polozenie)
-                or self.__ma_uklad_wygrywajacy_ukos_lewy(polozenie)
-                or self.__ma_uklad_wygrywajacy_ukos_prawy(polozenie))
+        wyj = False
+        if self.__ma_uklad_wygrywajacy_pion(polozenie):
+            wyj = True
+        elif self.__ma_uklad_wygrywajacy_poziom(polozenie):
+            wyj = True
+        elif self.__ma_uklad_wygrywajacy_ukos_lewy(polozenie):
+            wyj = True
+        elif self.__ma_uklad_wygrywajacy_ukos_prawy(polozenie):
+            wyj = True
+        return wyj
 
     def wolne_pola(self):
         """ zwraca generator wolnych pól (Polozenie) siatki """
@@ -167,10 +178,11 @@ class Siatka:
     def __zliczaj_symbole_w_kierunku(self, symbol, polozenie,
                                      kierunek):
         licznik = 0
+        idz_w_kierunku = Siatka.__kierunki[kierunek]
         while polozenie.nie_wychodzi_poza(self):
             if self.__pasuje_pozycja_symbol(polozenie, symbol):
                 licznik += 1
-                polozenie = (Siatka.__kierunki[kierunek])(polozenie)
+                polozenie = idz_w_kierunku(polozenie)
             else:
                 break
         return licznik

@@ -1,6 +1,5 @@
 class Wierzcholek:
     def __init__(self, stan_siatki, gracz):
-        nazwa = None
         self.siatka = stan_siatki
         self.gracz = gracz
         self.wartosc = None
