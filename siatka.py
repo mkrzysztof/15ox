@@ -1,6 +1,5 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
 import itertools
-import copy
 import symbol
 
 #stałe
@@ -109,8 +108,9 @@ class Siatka:
 
     def copy(self):
         """kopia ale tylko pola pola"""
-        wyjscie = copy.copy(self)
-        wyjscie.pola = copy.deepcopy(self.pola)
+        wyjscie = Siatka(self.wierszy, self.kolumn)
+        for nr, wiersz in enumerate(self.pola):
+            wyjscie.pola[nr] = wiersz.copy()
         return wyjscie
 
     def odczyt_polozenie(self, polozenie):

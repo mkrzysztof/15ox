@@ -20,10 +20,10 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
         if ruch is not None:
             if siatka.ma_uklad_wygrywajacy(ruch):
                 wierzcholek.wartosc = gracz.mnoznik
-                print("układ wygrywający dla", gracz.symbol,
-                      wierzcholek.wartosc, sep=', ')
-                print(siatka)
-                print("__________")
+                # print("układ wygrywający dla", gracz.symbol,
+                #       wierzcholek.wartosc, sep=', ')
+                # print(siatka)
+                # print("__________")
                 wolne_pola = []
             else:
                 wolne_pola = siatka.wolne_pola()
@@ -32,7 +32,7 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
         for ruch in wolne_pola:
             nastepna_siatka = siatka.copy()
             nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik.symbol)
-            print("następna siatka", nastepna_siatka, sep="\n")
+            # print("następna siatka", nastepna_siatka, sep="\n")
             pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka,
                                                  gracz.przeciwnik)
             wierzcholek.dodaj(ruch, pod_wierzcholek)

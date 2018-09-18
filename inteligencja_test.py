@@ -11,12 +11,12 @@ gracz2.przeciwnik = gracz1
 gracz1.mnoznik = -1
 gracz2.mnoznik = 1
 siatka_poczatkowa = siatka.Siatka(3, 3)
-wzor = ['xo.',
-        'oxx',
-        'o.o',]
+wzor = ['.o.',
+        '...',
+        '...',]
 siatka_poczatkowa.wypelnij_siatke(wzor)
 
-ostatni_ruch = siatka.Polozenie(2, 2)
+ostatni_ruch = siatka.Polozenie(0, 1)
 
 drzewo = inteligencja.buduj_drzewo(siatka_poczatkowa, gracz2)
 k, l = inteligencja.min_max(drzewo, gracz2)
