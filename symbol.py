@@ -12,7 +12,7 @@ class Symbol(object):
         """postaw na planszy symbol na pozycji"""
         pozycja = tuple(polozenie)
         plansza.zapis_polozenie(polozenie, cls)
-        zarzadca.rozeslij(cls.repr_graf, pozycja, plansza.surface)
+        zarzadca.rozeslij(cls.repr_graf.__class__, pozycja, plansza.surface)
 
 class Kolko(Symbol):
     """sybol kółka"""

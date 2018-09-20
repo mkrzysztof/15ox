@@ -79,6 +79,17 @@ def odczyt_poz_myszy():
     return siatka.Polozenie(*poz_w)
 
 
+def wyswietl_gracza(gracz, surface):
+    font = pygame.font.SysFont("", 40)
+    gumka = pygame.Rect((400, 400),(600, 440))
+    pygame.draw.rect(surface, pygame.color.THECOLORS['black'], gumka)
+    pygame.display.flip()
+    napis = font.render(gracz.nazwa, False, pygame.color.THECOLORS['green'])
+    surface.blit(napis, (400, 400))
+    pygame.display.flip()
+
+zarzadca.zarejestruj('wyswietl-gracza', wyswietl_gracza)
+
 if __name__ == "__main__":
     surface = pygame.display.set_mode((800, 600))
     plansza_rozmiar = (15, 15)

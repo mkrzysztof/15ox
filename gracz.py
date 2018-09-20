@@ -2,11 +2,12 @@ import grafika
 
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
-    def __init__(self, symbol):
+    def __init__(self, symbol, nazwa="GRACZ"):
         self.symbol = symbol
         self.wygrana = False
         self.mnoznik = 0
         self.przeciwnik = None
+        self.nazwa = nazwa
 
     def wyszukaj_wolne_pole(self, siatka):
         """metoda obstrakcyjna zwraca siatka.Polozenie reprezentującą położenie

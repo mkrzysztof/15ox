@@ -4,6 +4,7 @@ import plansza
 import symbol
 import gracz
 import grafika
+import zarzadca
 
 def pokaz_wywolanie(fun):
     """raportuje wuwołanie funkcjii do adnotacji"""
@@ -24,6 +25,7 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
     num_gracza = 0
     while not (pierwszy_gracz.wygrana or drugi_gracz.wygrana or remis):
         biezacy_gracz = gracze[num_gracza]
+        zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
         if plansza.ma_uklad_wygrywajacy(polozenie):
             biezacy_gracz.ustaw_wygrana()
@@ -37,8 +39,8 @@ if __name__ == "__main__":
     PLANSZA = plansza.Plansza(SURFACE)
     PLANSZA_ROZMIAR = (15, 15)
     grafika.rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
-    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko)
-    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk)
+    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz 1")
+    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz 2")
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
     gra(GRACZ1, GRACZ2, PLANSZA)
