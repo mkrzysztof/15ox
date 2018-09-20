@@ -18,14 +18,11 @@ class Symbol_graf:
             pozycja[0] + 1
         surface.blit(self.sym, (poz_x, poz_y))
         pygame.display.flip()
-
-    def fun_zwr(self, surface, param):
-        self.rysuj_na_pozycji(param, surface)
     
     def __init__(self):
         self.font = pygame.font.SysFont("", 30)
         self.sym = None
-        zarzadca.zarejestruj(self.__class__,self.fun_zwr)
+        zarzadca.zarejestruj(self.__class__,self.rysuj_na_pozycji)
 
 class Kolko_graf(Symbol_graf):    
     def __init__(self):
