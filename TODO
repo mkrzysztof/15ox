@@ -1,8 +1,14 @@
-rozpoznawanie ukośnych układów
-
-rozpoznawanie 4 a nie 5-ciu w jednej linii
-
-poziomy układ nie jest rozpoznawany przez właściwą funkcję
-
-zmienić klosę położenie na niemutowalną, operacje zmiany powodują zwrócenie
-nowego obiektu klasy Polozenie
+dodanie efektów graficznych:
+1) stworzenie planszy tytułowej na której będą opcje do wyboru:
+ wybór wielkości planszy:
+   - klasyczne kólko i krzyżyk
+   - 5 symboli
+     ustawienie ilości wierszy i kolumn każda wielkość >= 5
+ między kim ma się toczyć gra:
+   - 2 graczy ludzi
+     imię gracza 1, imię gracza 2
+   - gracz-kopmputer
+     imię gracza
+   - komputer-gracz
+     imię gracza
+     
