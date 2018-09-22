@@ -1,21 +1,20 @@
 import  pygame
 import siatka
 import zarzadca
+import sys
 
+#stałe
+WIELKOSC = 20 # liczba pixeli przypadających na komórkę
+POCZATEK = (50, 50)
+    
 pygame.init()
-
-class Parametry:
-    wielkosc = 20 # liczba pixeli przypadających na komórkę
-    poczatek = (50, 50)
 
 class Symbol_graf:
     """graficzna reprezentacja x lub o"""
 
     def rysuj_na_pozycji(self, pozycja, surface):
-        poz_x = Parametry.poczatek[1] + pozycja[1] * Parametry.wielkosc +\
-            pozycja[1] + 1
-        poz_y = Parametry.poczatek[0] + pozycja[0] * Parametry.wielkosc +\
-            pozycja[0] + 1
+        poz_x = POCZATEK[1] + pozycja[1] * WIELKOSC + pozycja[1] + 1
+        poz_y = POCZATEK[0] + pozycja[0] * WIELKOSC + pozycja[0] + 1
         surface.blit(self.sym, (poz_x, poz_y))
         pygame.display.flip()
     
@@ -42,40 +41,40 @@ def rysuj_siatke(plansza_rozmiar, surface):
     """ Rysuje plansze
     """
     wiersze, kolumny = plansza_rozmiar
-    wielkosc = Parametry.wielkosc
-    wielkosc_obszaru = (wiersze * wielkosc + wiersze + 1,
-                        kolumny * wielkosc + kolumny + 1)
+    wielkosc_obszaru = (wiersze * WIELKOSC + wiersze + 1,
+                        kolumny * WIELKOSC + kolumny + 1)
     obwodka = pygame.Rect((0, 0), wielkosc_obszaru)
-    obwodka.move_ip(*Parametry.poczatek)
+    obwodka.move_ip(*POCZATEK)
     pygame.draw.rect(surface, (255, 0, 0), obwodka, 1)
     #rysowanie linii poziomych
-    pozx_pocz = Parametry.poczatek[0]
-    pozx_koniec = pozx_pocz  + wiersze * wielkosc + wiersze
-    y = Parametry.poczatek[1] + wielkosc + 1
+    pozx_pocz = POCZATEK[0]
+    pozx_koniec = pozx_pocz  + wiersze * WIELKOSC + wiersze
+    y = POCZATEK[1] + WIELKOSC + 1
     for p in range(1, wiersze):
         pygame.draw.line(surface, (255, 0, 0),
                          (pozx_pocz, y), (pozx_koniec, y))
-        y += wielkosc + 1
-    pozy_pocz = Parametry.poczatek[1]
-    pozy_koniec = pozy_pocz + kolumny * wielkosc + kolumny
-    x = Parametry.poczatek[0] + wielkosc + 1
+        y += WIELKOSC + 1
+    pozy_pocz = POCZATEK[1]
+    pozy_koniec = pozy_pocz + kolumny * WIELKOSC + kolumny
+    x = POCZATEK[0] + WIELKOSC + 1
     for p in range(1, kolumny):
         pygame.draw.line(surface, (255, 0, 0),
                          (x, pozy_pocz), (x, pozy_koniec))
-        x += wielkosc + 1
+        x += WIELKOSC + 1
     pygame.display.flip()
 
 def odczyt_poz_myszy():
     wyj = False
     while not wyj:
         poz = pygame.mouse.get_pos()
-        poz = [poz[1] - Parametry.poczatek[1], poz[0] - Parametry.poczatek[0]]
-        poz_w = [x // (Parametry.wielkosc + 1) for x in poz]
+        poz = [poz[1] - POCZATEK[1], poz[0] - POCZATEK[0]]
+        poz_w = [x // (WIELKOSC + 1) for x in poz]
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 wyj = True
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit(0)
     return siatka.Polozenie(*poz_w)
 
 
@@ -101,4 +100,4 @@ if __name__ == "__main__":
         odczyt_poz_myszy()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                exit(0)
+                sys.exit(0)
