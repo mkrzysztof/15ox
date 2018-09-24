@@ -65,6 +65,7 @@ def rysuj_siatke(plansza_rozmiar, surface):
 
 def odczyt_poz_myszy():
     wyj = False
+    zegar = pygame.time.Clock()
     while not wyj:
         poz = pygame.mouse.get_pos()
         poz = [poz[1] - POCZATEK[1], poz[0] - POCZATEK[0]]
@@ -75,6 +76,7 @@ def odczyt_poz_myszy():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit(0)
+        zegar.tick(40)
     return siatka.Polozenie(*poz_w)
 
 
