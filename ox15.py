@@ -21,10 +21,8 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
     # w pp jeśli plansza zapełniona zgłoś remis\
     # w pp zmień bieżącego gracza
     remis = False
-    gracze = (pierwszy_gracz, drugi_gracz)
-    num_gracza = 0
+    biezacy_gracz = pierwszy_gracz
     while not (pierwszy_gracz.wygrana or drugi_gracz.wygrana or remis):
-        biezacy_gracz = gracze[num_gracza]
         zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
         if plansza.ma_uklad_wygrywajacy(polozenie):
@@ -32,7 +30,7 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
         elif plansza.jest_zapelniona():
             remis = True
         else:
-            num_gracza = (num_gracza + 1) % 2
+            biezacy_gracz = biezacy_gracz.przeciwnik
 
 if __name__ == "__main__":
     SURFACE = pygame.display.set_mode((800, 600))
