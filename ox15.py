@@ -1,11 +1,13 @@
 """Gra"""
 import pygame
+import siatka
 import plansza
 import symbol
 import gracz
 import grafika
 import zarzadca
 import gracz_komputer
+import plansza_wyboru_mod as pwm
 from monitoring import pokaz_wywolanie
 
 
@@ -32,11 +34,8 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
 
 if __name__ == "__main__":
     SURFACE = pygame.display.set_mode((800, 600))
-    PLANSZA_ROZMIAR = (3, 3)
-    PLANSZA = plansza.Plansza(SURFACE, *PLANSZA_ROZMIAR)
-    grafika.rysuj_siatke(PLANSZA_ROZMIAR, SURFACE)
-    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz 1")
-    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz 2")
-    GRACZ1.przeciwnik = GRACZ2
-    GRACZ2.przeciwnik = GRACZ1
-    gra(GRACZ1, GRACZ2, PLANSZA)
+    pwm.wybierz_xo()
+    siatka.WYGRYWAJACYCH = pwm.WYGRYWAJACYCH
+    PLANSZA = plansza.Plansza(SURFACE, *pwm.PLANSZA_ROZMIAR)
+    grafika.rysuj_siatke(pwm.PLANSZA_ROZMIAR, SURFACE)
+    gra(pwm.GRACZ1, pwm.GRACZ2, PLANSZA)
