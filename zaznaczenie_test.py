@@ -21,7 +21,8 @@ if __name__ == "__main__":
     przycisk2.umiesc_na_pozycji(50, 150, SURFACE)
     zegar = pygame.time.Clock()
     while True:
-        przycisk.wykryj_klikniecie()
-        zegar.tick(40)
-        przycisk2.wykryj_klikniecie()
-        zegar.tick(40)
+        events = pygame.event.get()
+        przycisk.wykryj_klikniecie(events)
+        #zegar.tick(15)
+        przycisk2.wykryj_klikniecie(events)
+        #zegar.tick(15)

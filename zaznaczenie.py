@@ -43,12 +43,13 @@ class PrzyciskGraf:
         print("wyczysc")
         self.reprezentacja = False
         
-    def wykryj_klikniecie(self):
-        """wykrywa zaznaczernie pola"""
+    def wykryj_klikniecie(self, pygame_events):
+        """wykrywa zaznaczernie pola jako argument przyjmuje
+        listę zdarzeń pygame"""
         zajmowany_obszar = self.zajmowany_obszar
         poz_myszy = pygame.mouse.get_pos()
         pozycja_pola = zajmowany_obszar.topleft
-        for event in pygame.event.get():
+        for event in pygame_events:
             if (event.type == pygame.MOUSEBUTTONDOWN
                 and zajmowany_obszar.collidepoint(poz_myszy)
                 and not self.reprezentacja):
