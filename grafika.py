@@ -6,6 +6,8 @@ import sys
 #stałe
 WIELKOSC = 20 # liczba pixeli przypadających na komórkę
 POCZATEK = (50, 50)
+WIERSZ = 0
+KOLUMNA = 1
     
 pygame.init()
 
@@ -13,8 +15,10 @@ class Symbol_graf:
     """graficzna reprezentacja x lub o"""
 
     def rysuj_na_pozycji(self, pozycja, surface):
-        poz_x = POCZATEK[1] + pozycja[1] * WIELKOSC + pozycja[1] + 1
-        poz_y = POCZATEK[0] + pozycja[0] * WIELKOSC + pozycja[0] + 1
+        poz_x = POCZATEK[KOLUMNA] + pozycja[KOLUMNA] * WIELKOSC
+        + pozycja[KOLUMNA] + 1
+        poz_y = POCZATEK[WIERSZ] + pozycja[WIERSZ] * WIELKOSC
+        + pozycja[WIERSZ] + 1
         surface.blit(self.sym, (poz_x, poz_y))
         pygame.display.flip()
     
@@ -40,25 +44,26 @@ class Puste_graf(Symbol_graf):
 def rysuj_siatke(plansza_rozmiar, surface):
     """ Rysuje plansze
     """
+    CZERWONY = pygame.color.THECOLORS['red']
     wiersze, kolumny = plansza_rozmiar
     wielkosc_obszaru = (wiersze * WIELKOSC + wiersze + 1,
                         kolumny * WIELKOSC + kolumny + 1)
     obwodka = pygame.Rect((0, 0), wielkosc_obszaru)
     obwodka.move_ip(*POCZATEK)
-    pygame.draw.rect(surface, (255, 0, 0), obwodka, 1)
+    pygame.draw.rect(surface, CZERWONY, obwodka, 1)
     #rysowanie linii poziomych
     pozx_pocz = POCZATEK[0]
     pozx_koniec = pozx_pocz  + wiersze * WIELKOSC + wiersze
     y = POCZATEK[1] + WIELKOSC + 1
     for p in range(1, wiersze):
-        pygame.draw.line(surface, (255, 0, 0),
+        pygame.draw.line(surface, CZERWONY,
                          (pozx_pocz, y), (pozx_koniec, y))
         y += WIELKOSC + 1
     pozy_pocz = POCZATEK[1]
     pozy_koniec = pozy_pocz + kolumny * WIELKOSC + kolumny
     x = POCZATEK[0] + WIELKOSC + 1
     for p in range(1, kolumny):
-        pygame.draw.line(surface, (255, 0, 0),
+        pygame.draw.line(surface, CZERWONY,
                          (x, pozy_pocz), (x, pozy_koniec))
         x += WIELKOSC + 1
     pygame.display.flip()
@@ -81,12 +86,14 @@ def odczyt_poz_myszy():
 
 
 def wyswietl_gracza(gracz, surface):
-    font = pygame.font.SysFont("", 40)
-    gumka = pygame.Rect((400, 400),(600, 440))
+    WIELKOSC_FONT = 40
+    POZYCJA = (400, 400)
+    font = pygame.font.SysFont("", WIELKOSC_FONT)
+    napis = font.render(gracz.nazwa, False, pygame.color.THECOLORS['green'])
+    gumka = napis.get_rect().move(*POZYCJA)
     pygame.draw.rect(surface, pygame.color.THECOLORS['black'], gumka)
     pygame.display.flip()
-    napis = font.render(gracz.nazwa, False, pygame.color.THECOLORS['green'])
-    surface.blit(napis, (400, 400))
+    surface.blit(napis, POZYCJA)
     pygame.display.flip()
 
 zarzadca.zarejestruj('wyswietl-gracza', wyswietl_gracza)
