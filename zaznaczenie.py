@@ -13,9 +13,9 @@ ODZNACZONY = pygame.image.load('odznaczony.png')
 class PrzyciskGraf:
     """graficzna reprezentacja elementu"""
 
-    def dodaj_obsluge(self, komunikat, funkcja_zwrotna, parametr = None):
+    def dodaj_obsluge(self, komunikat, funkcja_zwrotna, *parametry):
         self.komunikat = komunikat
-        self.parametr = parametr
+        self.parametry = parametry
         zarzadca.zarejestruj(komunikat, funkcja_zwrotna)
     
     def __init__(self, komunikat=None, funkcja_zwrotna=None):
@@ -23,6 +23,7 @@ class PrzyciskGraf:
         self.reprezentacja = False #nie zaznaczone
         self.zajmowany_obszar = None
         self.surface = None
+        self.parametry = None
         if komunikat is not None:
             self.dodaj_obsluge(komunikat, funkcja_zwrotna)
 
@@ -62,4 +63,4 @@ class PrzyciskGraf:
         """zaznacza pole wyboru"""
         if not self.reprezentacja:
             self.reprezentacja = True
-            zarzadca.rozeslij(self.komunikat, self.parametr)
+            zarzadca.rozeslij(self.komunikat, *self.parametry)
