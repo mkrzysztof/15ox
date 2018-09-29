@@ -14,8 +14,10 @@ class PrzyciskGraf:
     """graficzna reprezentacja elementu"""
 
     def dodaj_obsluge(self, komunikat, funkcja_zwrotna, *parametry):
+        print('aaaa', self)
         self.komunikat = komunikat
-        self.parametry = parametry
+        if parametry:
+            self.parametry = parametry
         zarzadca.zarejestruj(komunikat, funkcja_zwrotna)
     
     def __init__(self, komunikat=None, funkcja_zwrotna=None):
