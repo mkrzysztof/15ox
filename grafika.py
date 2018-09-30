@@ -1,5 +1,6 @@
-import  pygame
+import pygame
 import siatka
+import symbol
 import zarzadca
 import sys
 
@@ -25,7 +26,6 @@ class Symbol_graf:
     def __init__(self):
         self.font = pygame.font.SysFont("", 30)
         self.sym = None
-        zarzadca.zarejestruj(self.__class__,self.rysuj_na_pozycji)
 
 class Kolko_graf(Symbol_graf):    
     def __init__(self):
@@ -40,6 +40,20 @@ class Krzyzyk_graf(Symbol_graf):
 
 class Puste_graf(Symbol_graf):
     pass
+
+reprezentacja = {symbol.Puste: Puste_graf(), symbol.Kolko: Kolko_graf(),
+                 symbol.Krzyzyk: Krzyzyk_graf()}
+
+def rysuj_na_pozycji(symbol, pozycja, surface):
+        poz_x = POCZATEK[KOLUMNA] + pozycja[KOLUMNA] * WIELKOSC
+        + pozycja[KOLUMNA] + 1
+        poz_y = POCZATEK[WIERSZ] + pozycja[WIERSZ] * WIELKOSC
+        + pozycja[WIERSZ] + 1
+        surface.blit(reprezentacja[symbol].sym, (poz_x, poz_y))
+        pygame.display.flip()
+
+zarzadca.zarejestruj("kolko", rysuj_na_pozycji)
+zarzadca.zarejestruj("krzyzyk", rysuj_na_pozycji)
 
 def rysuj_siatke(plansza_rozmiar, surface):
     """ Rysuje plansze

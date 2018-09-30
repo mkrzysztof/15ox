@@ -1,7 +1,6 @@
 """zawiera ustawienia gry"""
 import gracz
 import symbol
-import grafika
 
 PLANSZA_ROZMIAR = (15, 15)
 WYGRYWAJACYCH = 3

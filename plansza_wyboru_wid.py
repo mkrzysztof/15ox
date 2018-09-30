@@ -1,8 +1,5 @@
 """wizualna część plansza_wyboru"""
 import pygame
-import siatka
-import symbol
-import grafika
 import plansza_wyboru_mod as pwm
 import zaznaczenie
 
@@ -20,10 +17,9 @@ def funkcja_obslugi(kl):
         
 def main():
     surface = pygame.display.set_mode(ROZMIAR)
-    for kl in klucze_rozmiar:
-        wybor_rozmiaru[kl].dodaj_obsluge(kl, funkcja_obslugi, kl)
     pozycje = [(50, 50), (50, 100), (50, 150)]
     for kl, poz in zip(klucze_rozmiar, pozycje):
+        wybor_rozmiaru[kl].dodaj_obsluge(kl, funkcja_obslugi, kl)
         wybor_rozmiaru[kl].umiesc_na_pozycji(*poz, surface)
     while True:
         events = pygame.event.get()
