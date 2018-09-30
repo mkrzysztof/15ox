@@ -55,17 +55,14 @@ def rysuj_na_pozycji(symbol, pozycja, surface):
 zarzadca.zarejestruj("kolko", rysuj_na_pozycji)
 zarzadca.zarejestruj("krzyzyk", rysuj_na_pozycji)
 
-def rysuj_siatke(plansza_rozmiar, surface):
-    """ Rysuje plansze
-    """
-    CZERWONY = pygame.color.THECOLORS['red']
-    wiersze, kolumny = plansza_rozmiar
-    wielkosc_obszaru = (wiersze * WIELKOSC + wiersze + 1,
-                        kolumny * WIELKOSC + kolumny + 1)
+CZERWONY = pygame.color.THECOLORS['red']
+def rysuj_obwodke(wielkosc_obszaru, surface):
     obwodka = pygame.Rect((0, 0), wielkosc_obszaru)
     obwodka.move_ip(*POCZATEK)
     pygame.draw.rect(surface, CZERWONY, obwodka, 1)
-    #rysowanie linii poziomych
+
+
+def rysuj_linie_poziome(wiersze, surface):
     pozx_pocz = POCZATEK[0]
     pozx_koniec = pozx_pocz  + wiersze * WIELKOSC + wiersze
     y = POCZATEK[1] + WIELKOSC + 1
@@ -73,6 +70,8 @@ def rysuj_siatke(plansza_rozmiar, surface):
         pygame.draw.line(surface, CZERWONY,
                          (pozx_pocz, y), (pozx_koniec, y))
         y += WIELKOSC + 1
+
+def rysuj_linie_pionowe(kolumny, surface):
     pozy_pocz = POCZATEK[1]
     pozy_koniec = pozy_pocz + kolumny * WIELKOSC + kolumny
     x = POCZATEK[0] + WIELKOSC + 1
@@ -80,21 +79,36 @@ def rysuj_siatke(plansza_rozmiar, surface):
         pygame.draw.line(surface, CZERWONY,
                          (x, pozy_pocz), (x, pozy_koniec))
         x += WIELKOSC + 1
+
+def rysuj_siatke(plansza_rozmiar, surface):
+    """ Rysuje plansze
+    """
+    wiersze, kolumny = plansza_rozmiar
+    wielkosc_obszaru = (wiersze * WIELKOSC + wiersze + 1,
+                        kolumny * WIELKOSC + kolumny + 1)
+    rysuj_obwodke(wielkosc_obszaru, surface)
+    rysuj_linie_poziome(wiersze, surface)
+    rysuj_linie_pionowe(kolumny, surface)
     pygame.display.flip()
 
-def odczyt_poz_myszy():
+def czy_zatwierdzono_pozycje(events):
     wyj = False
+    for event in events:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            wyj = True
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit(0)
+    return wyj
+
+def odczyt_poz_myszy():
+    zatwierdzono = False
     zegar = pygame.time.Clock()
-    while not wyj:
+    while not zatwierdzono:
         poz = pygame.mouse.get_pos()
         poz = [poz[1] - POCZATEK[1], poz[0] - POCZATEK[0]]
         poz_w = [x // (WIELKOSC + 1) for x in poz]
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                wyj = True
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit(0)
+        zatwierdzono = czy_zatwierdzono_pozycje(pygame.event.get())
         zegar.tick(40)
     return siatka.Polozenie(*poz_w)
 
@@ -113,11 +127,13 @@ def wyswietl_gracza(gracz, surface):
 zarzadca.zarejestruj('wyswietl-gracza', wyswietl_gracza)
 
 if __name__ == "__main__":
+    import plansza
     surface = pygame.display.set_mode((800, 600))
     plansza_rozmiar = (15, 15)
+    plansza = plansza.Plansza(surface, *plansza_rozmiar)
     rysuj_siatke(plansza_rozmiar, surface)
-    Krzyzyk_graf.rysuj_na_pozycji((10, 10), surface)
-    Kolko_graf.rysuj_na_pozycji((0, 8), surface)
+    symbol.Krzyzyk.postaw_na_planszy(plansza, (10, 10))
+    symbol.Kolko.postaw_na_planszy(plansza, (13, 10))
     pygame.display.flip()
     while True:
         odczyt_poz_myszy()
