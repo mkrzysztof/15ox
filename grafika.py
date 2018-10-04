@@ -4,13 +4,15 @@ import symbol
 import zarzadca
 import sys
 
-#stałe
-WIELKOSC = 20 # liczba pixeli przypadających na komórkę
+# stałe
+WIELKOSC = 20  # liczba pixeli przypadających na komórkę
 POCZATEK = (50, 50)
 WIERSZ = 0
 KOLUMNA = 1
-    
+
+
 pygame.init()
+
 
 class Symbol_graf:
     """graficzna reprezentacja x lub o"""
@@ -22,12 +24,13 @@ class Symbol_graf:
         + pozycja[WIERSZ] + 1
         surface.blit(self.sym, (poz_x, poz_y))
         pygame.display.flip()
-    
+
     def __init__(self):
         self.font = pygame.font.SysFont("", 30)
         self.sym = None
 
-class Kolko_graf(Symbol_graf):    
+
+class Kolko_graf(Symbol_graf):
     def __init__(self):
         super().__init__()
         self.sym = self.font.render('o', False, (0, 255, 0))
@@ -38,11 +41,14 @@ class Krzyzyk_graf(Symbol_graf):
         super().__init__()
         self.sym = self.font.render('x', False, (0, 255, 0))
 
+
 class Puste_graf(Symbol_graf):
     pass
 
+
 reprezentacja = {symbol.Puste: Puste_graf(), symbol.Kolko: Kolko_graf(),
                  symbol.Krzyzyk: Krzyzyk_graf()}
+
 
 def rysuj_na_pozycji(symbol, pozycja, surface):
         poz_x = POCZATEK[KOLUMNA] + pozycja[KOLUMNA] * WIELKOSC
@@ -56,6 +62,8 @@ zarzadca.zarejestruj("kolko", rysuj_na_pozycji)
 zarzadca.zarejestruj("krzyzyk", rysuj_na_pozycji)
 
 CZERWONY = pygame.color.THECOLORS['red']
+
+
 def rysuj_obwodke(wielkosc_obszaru, surface):
     obwodka = pygame.Rect((0, 0), wielkosc_obszaru)
     obwodka.move_ip(*POCZATEK)
@@ -64,12 +72,13 @@ def rysuj_obwodke(wielkosc_obszaru, surface):
 
 def rysuj_linie_poziome(wiersze, surface):
     pozx_pocz = POCZATEK[0]
-    pozx_koniec = pozx_pocz  + wiersze * WIELKOSC + wiersze
+    pozx_koniec = pozx_pocz + wiersze * WIELKOSC + wiersze
     y = POCZATEK[1] + WIELKOSC + 1
     for p in range(1, wiersze):
         pygame.draw.line(surface, CZERWONY,
                          (pozx_pocz, y), (pozx_koniec, y))
         y += WIELKOSC + 1
+
 
 def rysuj_linie_pionowe(kolumny, surface):
     pozy_pocz = POCZATEK[1]
@@ -79,6 +88,7 @@ def rysuj_linie_pionowe(kolumny, surface):
         pygame.draw.line(surface, CZERWONY,
                          (x, pozy_pocz), (x, pozy_koniec))
         x += WIELKOSC + 1
+
 
 def rysuj_siatke(plansza_rozmiar, surface):
     """ Rysuje plansze
@@ -91,6 +101,7 @@ def rysuj_siatke(plansza_rozmiar, surface):
     rysuj_linie_pionowe(kolumny, surface)
     pygame.display.flip()
 
+
 def czy_zatwierdzono_pozycje(events):
     wyj = False
     for event in events:
@@ -100,6 +111,7 @@ def czy_zatwierdzono_pozycje(events):
             pygame.quit()
             sys.exit(0)
     return wyj
+
 
 def odczyt_poz_myszy():
     zatwierdzono = False
