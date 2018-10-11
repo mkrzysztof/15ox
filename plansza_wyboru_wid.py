@@ -11,7 +11,9 @@ rozmiary_planszy = ['xo', '10x10', '15x15',]
 przyciski_zmian = {k : zaznaczenie.PrzyciskGraf() for k in rozmiary_planszy}
 wybory_rozmiarow = [pwm.wybierz_xo, pwm.wybierz_10x10, pwm.wybierz_15x15]
 fun_wyborow = dict(zip(rozmiary_planszy, wybory_rozmiarow))
+przycisk_OK = zaznaczenie.PrzyciskOK()
 
+# obsługa zgrupoowanych trzech przycisków
 def funkcja_obslugi(rozmiar):
     fun_wyborow[rozmiar]()
     for k in (set(rozmiary_planszy) - {rozmiar}):
@@ -48,6 +50,19 @@ def dodaj_napisy(surface):
     pozycje_napisow = [(poz_x_napisu, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
                        for i in range(len(rozmiary_planszy))]
     umiesc_napisy(rozmiary_planszy, pozycje_napisow, surface)
+
+
+# przycisk OK
+
+def funkcja_obslugi_OK():
+    pwm.zatwierdzono_wybor = True
+
+def wyswietl_OK(surface):
+    przycisk_OK.umiesc_na_pozycji(200, 200, surface)
+    przycisk_OK.dodaj_obsluge("OK", funkcja_obslugi_OK, None)
+
+def obsloz_OK(events, przycisk_OK):
+    przycisk_OK.wykryj_klikniecie(events)
         
 def main():
     surface = pygame.display.set_mode(ROZMIAR)

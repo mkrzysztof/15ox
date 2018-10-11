@@ -9,6 +9,8 @@ GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz2")
 GRACZ1.przeciwnik = GRACZ2
 GRACZ2.przeciwnik = GRACZ1
 
+zatwierdzono_wybor = False
+
 def wybierz_xo():
     """klasyczna gra w kółko i krzyżyk na planszy 3x3"""
     global PLANSZA_ROZMIAR, WYGRYWAJACYCH
