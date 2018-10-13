@@ -25,10 +25,12 @@ def wybierz_5():
 
 def wybierz_10x10():
     """wybierz planszę 10x10"""
+    global PLANSZA_ROZMIAR, WYGRYWAJACYCH
     WYGRYWAJACYCH = 5
     PLANSZA_ROZMIAR = (10, 10)
 
 def wybierz_15x15():
     """wybierz planszę 15x15"""
+    global PLANSZA_ROZMIAR, WYGRYWAJACYCH
     WYGRYWAJACYCH = 5
     PLANSZA_ROZMIAR = (15, 15)
