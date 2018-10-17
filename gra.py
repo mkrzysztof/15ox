@@ -19,8 +19,8 @@ def pokaz_wybory():
     pww.wyswietl_OK(surface)
     while not pwm.zatwierdzono_wybor:
         events = pygame.event.get()
-        pww.obsluz_przyciski(events, pww.przyciski_zmian)
-        pww.obsloz_OK(events, pww.przycisk_OK)
+        pww.obsluz_przyciski(events, pww.PRZYCISKI_ZMIAN)
+        pww.obsloz_OK(events, pww.PRZYCISK_OK)
         obsloz_zamkniecie(events)
     surface.fill(pygame.color.THECOLORS['black'])
     pygame.display.flip()
