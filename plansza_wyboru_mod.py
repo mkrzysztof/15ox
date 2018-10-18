@@ -1,6 +1,7 @@
 """zawiera ustawienia gry"""
 import gracz
 import symbol
+import gracz_komputer
 
 PLANSZA_ROZMIAR = (15, 15)
 WYGRYWAJACYCH = 3
@@ -36,10 +37,22 @@ def wybierz_15x15():
     PLANSZA_ROZMIAR = (15, 15)
 
 def wybierz_gracz_gracz():
-    pass
+    global GRACZ1, GRACZ2
+    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz1")
+    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz2")
+    GRACZ1.przeciwnik = GRACZ2
+    GRACZ2.przeciwnik = GRACZ1
 
 def wybierz_gracz_komputer():
-    pass
+    global GRACZ1, GRACZ2
+    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz1")
+    GRACZ2 = gracz_komputer.GraczKomputer(symbol.Krzyzyk, "Gracz2")
+    GRACZ1.przeciwnik = GRACZ2
+    GRACZ2.przeciwnik = GRACZ1
 
 def wybierz_komputer_gracz():
-    pass
+    global GRACZ1, GRACZ2
+    GRACZ1 = gracz_komputer.GraczKomputer(symbol.Kolko, "Gracz1")
+    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz2")
+    GRACZ1.przeciwnik = GRACZ2
+    GRACZ2.przeciwnik = GRACZ1

@@ -13,7 +13,7 @@ WYBORY_ROZMIAROW = [pwm.wybierz_xo, pwm.wybierz_10x10, pwm.wybierz_15x15]
 FUN_WYBOROW = dict(zip(ROZMIARY_PLANSZY, WYBORY_ROZMIAROW))
 PRZYCISK_OK = zaznaczenie.PrzyciskOK()
 KTO_GRA = ['GRACZ - GRACZ', 'KOMPUTER - GRACZ', 'GRACZ - KOMPUTER']
-PRZYCISK_KTO_GRA = {k: zaznaczenie.PrzyciskGraf() for k in KTO_GRA}
+PRZYCISKI_KTO_GRA = {k: zaznaczenie.PrzyciskGraf() for k in KTO_GRA}
 WYBOR_KTO_GRA = [pwm.wybierz_gracz_gracz, pwm.wybierz_komputer_gracz,
                  pwm.wybierz_gracz_komputer]
 FUN_KTO_GRA = dict(zip(KTO_GRA, WYBOR_KTO_GRA))
@@ -26,17 +26,15 @@ def _obsluga_radio(funkcje_obslugi, przyciski, aktywna_opcja):
         przyciski[k].wyczysc()
 
 # obsługa zgrupowanych trzech przycisków
-def _funkcja_obslugi(rozmiar):
+def _funkcja_obslugi_roz(rozmiar):
     _obsluga_radio(FUN_WYBOROW, PRZYCISKI_ZMIAN, rozmiar)
+
+def _funkcja_obslugi_ile(kto):
+    _obsluga_radio(FUN_KTO_GRA, PRZYCISKI_KTO_GRA, kto)
 
 def _umiesc_radio(opcje, przyciski, pozycje, surface):
     for opcja, pozycja in zip(opcje, pozycje):
         przyciski[opcja].umiesc_na_pozycji(*pozycja, surface)
-    
-def _umiesc_przyciski(ROZMIARY_PLANSZY, pozycje_przyc, surface):
-    # for rozmiar, pozycja in zip(ROZMIARY_PLANSZY, pozycje_przyc):
-    #     PRZYCISKI_ZMIAN[rozmiar].umiesc_na_pozycji(*pozycja, surface)
-    _umiesc_radio(ROZMIARY_PLANSZY, PRZYCISKI_ZMIAN, pozycje_przyc, surface)
 
 def _umiesc_napisy(ROZMIARY_PLANSZY, pozycje_napisow, surface):
     font = pygame.font.SysFont("", 30)
@@ -48,10 +46,9 @@ def _umiesc_napisy(ROZMIARY_PLANSZY, pozycje_napisow, surface):
 def _umiesc_przyciski_ile(ROZMIARY_PLANSZY, pozycje_przyc, surface):
     pass
 
-def _dolacz_obsluge(ROZMIARY_PLANSZY, _funkcja_obslugi):
-    for rozmiar in ROZMIARY_PLANSZY:
-        PRZYCISKI_ZMIAN[rozmiar].dodaj_obsluge(rozmiar, _funkcja_obslugi,
-                                               rozmiar)
+def _dolacz_obsluge(opcje, przyciski, funkcja_obslugi):
+    for opcja in opcje:
+        przyciski[opcja].dodaj_obsluge(opcja, funkcja_obslugi, opcja)
 
 def _dolacz_obsluge_ile(ROZMIARY_PLANSZY, _funkcja_obslugi):
     pass
@@ -61,14 +58,15 @@ def obsluz_przyciski_rozm(events, przyciski):
         przycisk.wykryj_klikniecie(events)
 
 def obsluz_przyciski_ile(events, przyciski):
-    pass
+    for rozmiar, przycisk in przyciski.items():
+        przycisk.wykryj_klikniecie(events)
         
 def utworz_przyciski_rozm(surface):
     poz_x_przycisku = 50
     pozycje_przyc = [(poz_x_przycisku, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
                      for i in range(len(ROZMIARY_PLANSZY))]
     _umiesc_radio(ROZMIARY_PLANSZY, PRZYCISKI_ZMIAN, pozycje_przyc, surface)
-    _dolacz_obsluge(ROZMIARY_PLANSZY, _funkcja_obslugi)
+    _dolacz_obsluge(ROZMIARY_PLANSZY, PRZYCISKI_ZMIAN, _funkcja_obslugi_roz)
 
 def dodaj_napisy_rozm(surface):
     poz_x_napisu = 100
@@ -92,14 +90,17 @@ def obsloz_OK(events, PRZYCISK_OK):
 # przyciski wybór ilości
 
 def utworz_przyciski_ile(surface):
-    poz_x_przycisku = 100
+    poz_x_przycisku = 120
     pozycje_przyc = [(poz_x_przycisku, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
-                     for i in range(len(ROZMIARY_PLANSZY))]
-    _umiesc_przyciski_ile(ROZMIARY_PLANSZY, pozycje_przyc, surface)
-    _dolacz_obsluge_ile(ROZMIARY_PLANSZY, _funkcja_obslugi)
+                     for i in range(len(KTO_GRA))]
+    _umiesc_radio(KTO_GRA, PRZYCISKI_KTO_GRA, pozycje_przyc, surface)
+    _dolacz_obsluge(KTO_GRA, PRZYCISKI_KTO_GRA, _funkcja_obslugi_ile)
 
 def dodaj_napisy_ile(surface):
-    pass
+    poz_x_napisu = 250
+    pozycje_napisow = [(poz_x_napisu, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
+                       for i in range(len(KTO_GRA))]
+    _umiesc_napisy(KTO_GRA, pozycje_napisow, surface)
 
 
 if __name__ == "__main__":

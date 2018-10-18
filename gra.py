@@ -22,7 +22,7 @@ def pokaz_wybory():
     while not pwm.zatwierdzono_wybor:
         events = pygame.event.get()
         pww.obsluz_przyciski_rozm(events, pww.PRZYCISKI_ZMIAN)
-        pww.obsluz_przyciski_ile(events, pww.PRZYCISK_KTO_GRA)
+        pww.obsluz_przyciski_ile(events, pww.PRZYCISKI_KTO_GRA)
         pww.obsloz_OK(events, pww.PRZYCISK_OK)
         obsloz_zamkniecie(events)
     surface.fill(pygame.color.THECOLORS['black'])

@@ -6,6 +6,8 @@ from monitoring import pokaz_wywolanie
 
 class GraczKomputer(gracz.Gracz):
     """Klasa reprezentująca komputer"""
+    def __init__(self, symbol, nazwa="GRACZ"):
+                super().__init__(symbol, nazwa="GRACZ")
     @pokaz_wywolanie
     def wyszukaj_wolne_pole(self, siatka):
         siatka_kopia = copy.deepcopy(siatka)
