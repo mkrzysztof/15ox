@@ -14,7 +14,8 @@ FUN_WYBOROW = dict(zip(ROZMIARY_PLANSZY, WYBORY_ROZMIAROW))
 PRZYCISK_OK = zaznaczenie.PrzyciskOK()
 KTO_GRA = ['GRACZ - GRACZ', 'KOMPUTER - GRACZ', 'GRACZ - KOMPUTER']
 PRZYCISK_KTO_GRA = {k: zaznaczenie.PrzyciskGraf() for k in KTO_GRA}
-WYBOR_KTO_GRA = []
+WYBOR_KTO_GRA = [pwm.wybierz_gracz_gracz, pwm.wybierz_komputer_gracz,
+                 pwm.wybierz_gracz_komputer]
 FUN_KTO_GRA = dict(zip(KTO_GRA, WYBOR_KTO_GRA))
 
 def _obsluga_radio(funkcje_obslugi, przyciski, aktywna_opcja):
@@ -44,22 +45,32 @@ def _umiesc_napisy(ROZMIARY_PLANSZY, pozycje_napisow, surface):
         surface.blit(napis, pozycja)
     pygame.display.flip()
 
+def _umiesc_przyciski_ile(ROZMIARY_PLANSZY, pozycje_przyc, surface):
+    pass
+
 def _dolacz_obsluge(ROZMIARY_PLANSZY, _funkcja_obslugi):
     for rozmiar in ROZMIARY_PLANSZY:
         PRZYCISKI_ZMIAN[rozmiar].dodaj_obsluge(rozmiar, _funkcja_obslugi,
                                                rozmiar)
-def obsluz_przyciski(events, przyciski):
+
+def _dolacz_obsluge_ile(ROZMIARY_PLANSZY, _funkcja_obslugi):
+    pass
+
+def obsluz_przyciski_rozm(events, przyciski):
     for rozmiar, przycisk in przyciski.items():
         przycisk.wykryj_klikniecie(events)
+
+def obsluz_przyciski_ile(events, przyciski):
+    pass
         
-def utworz_przyciski(surface):
+def utworz_przyciski_rozm(surface):
     poz_x_przycisku = 50
     pozycje_przyc = [(poz_x_przycisku, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
                      for i in range(len(ROZMIARY_PLANSZY))]
-    _umiesc_przyciski(ROZMIARY_PLANSZY, pozycje_przyc, surface)
+    _umiesc_radio(ROZMIARY_PLANSZY, PRZYCISKI_ZMIAN, pozycje_przyc, surface)
     _dolacz_obsluge(ROZMIARY_PLANSZY, _funkcja_obslugi)
 
-def dodaj_napisy(surface):
+def dodaj_napisy_rozm(surface):
     poz_x_napisu = 100
     pozycje_napisow = [(poz_x_napisu, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
                        for i in range(len(ROZMIARY_PLANSZY))]
@@ -78,7 +89,19 @@ def wyswietl_OK(surface):
 def obsloz_OK(events, PRZYCISK_OK):
     PRZYCISK_OK.wykryj_klikniecie(events)
         
-    
+# przyciski wybór ilości
+
+def utworz_przyciski_ile(surface):
+    poz_x_przycisku = 100
+    pozycje_przyc = [(poz_x_przycisku, POZ_Y_POCZATKOWA + i * PIONOWY_ODSTEP)
+                     for i in range(len(ROZMIARY_PLANSZY))]
+    _umiesc_przyciski_ile(ROZMIARY_PLANSZY, pozycje_przyc, surface)
+    _dolacz_obsluge_ile(ROZMIARY_PLANSZY, _funkcja_obslugi)
+
+def dodaj_napisy_ile(surface):
+    pass
+
+
 if __name__ == "__main__":
     def main():
         surface = pygame.display.set_mode(ROZMIAR)

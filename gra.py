@@ -14,12 +14,15 @@ def obsloz_zamkniecie(events):
 
 def pokaz_wybory():
     surface = pygame.display.set_mode(pww.ROZMIAR)
-    pww.utworz_przyciski(surface)
-    pww.dodaj_napisy(surface)
+    pww.utworz_przyciski_rozm(surface)
+    pww.dodaj_napisy_rozm(surface)
     pww.wyswietl_OK(surface)
+    pww.utworz_przyciski_ile(surface)
+    pww.dodaj_napisy_ile(surface)
     while not pwm.zatwierdzono_wybor:
         events = pygame.event.get()
-        pww.obsluz_przyciski(events, pww.PRZYCISKI_ZMIAN)
+        pww.obsluz_przyciski_rozm(events, pww.PRZYCISKI_ZMIAN)
+        pww.obsluz_przyciski_ile(events, pww.PRZYCISK_KTO_GRA)
         pww.obsloz_OK(events, pww.PRZYCISK_OK)
         obsloz_zamkniecie(events)
     surface.fill(pygame.color.THECOLORS['black'])

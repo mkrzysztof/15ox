@@ -34,3 +34,12 @@ def wybierz_15x15():
     global PLANSZA_ROZMIAR, WYGRYWAJACYCH
     WYGRYWAJACYCH = 5
     PLANSZA_ROZMIAR = (15, 15)
+
+def wybierz_gracz_gracz():
+    pass
+
+def wybierz_gracz_komputer():
+    pass
+
+def wybierz_komputer_gracz():
+    pass
