@@ -9,6 +9,8 @@ import zarzadca
 import gracz_komputer
 import plansza_wyboru_mod as pwm
 from monitoring import pokaz_wywolanie
+import plansza_koncowa
+import time
 
 
 def gra(pierwszy_gracz, drugi_gracz, plansza):
@@ -20,17 +22,30 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
     # w pp zmień bieżącego gracza
     remis = False
     biezacy_gracz = pierwszy_gracz
-    while not (pierwszy_gracz.wygrana or drugi_gracz.wygrana or remis):
-        zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
-        polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
+    def zdecyduj_o_koncu():
+        nonlocal biezacy_gracz, remis
         if plansza.ma_uklad_wygrywajacy(polozenie):
             biezacy_gracz.ustaw_wygrana()
             print(plansza.pola)
+            zarzadca.rozeslij('pokaz-wygrana', remis, biezacy_gracz,
+                              plansza.surface)
         elif plansza.jest_zapelniona():
             remis = True
             print("Remis")
+            zarzadca.rozeslij('pokaz-wygrana', remis, biezacy_gracz,
+                              plansza.surface)
         else:
             biezacy_gracz = biezacy_gracz.przeciwnik
+
+    def czy_koniec():
+        return (pierwszy_gracz.wygrana or drugi_gracz.wygrana or remis)
+            
+    while not czy_koniec():
+        zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
+        polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
+        zdecyduj_o_koncu()
+    # pauza
+    time.sleep(5.5)
 
 if __name__ == "__main__":
     SURFACE = pygame.display.set_mode((800, 600))
