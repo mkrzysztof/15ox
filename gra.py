@@ -12,25 +12,34 @@ def obsloz_zamkniecie(events):
         if event.type == pygame.QUIT:
             sys.exit(0)
 
-def pokaz_wybory():
-    surface = pygame.display.set_mode(pww.ROZMIAR)
+def wybierz_opcje():
+    events = pygame.event.get()
+    pww.obsluz_przyciski(events, pww.PRZYCISKI_ZMIAN)
+    pww.obsluz_przyciski(events, pww.PRZYCISKI_KTO_GRA)
+    pww.obsloz_OK(events, pww.PRZYCISK_OK)
+    obsloz_zamkniecie(events)
+
+def przygotuj_formatki(surface):
     pww.utworz_przyciski_rozm(surface)
     pww.dodaj_napisy_rozm(surface)
     pww.wyswietl_OK(surface)
     pww.utworz_przyciski_ile(surface)
     pww.dodaj_napisy_ile(surface)
-    while not pwm.zatwierdzono_wybor:
-        events = pygame.event.get()
-        pww.obsluz_przyciski(events, pww.PRZYCISKI_ZMIAN)
-        pww.obsluz_przyciski(events, pww.PRZYCISKI_KTO_GRA)
-        pww.obsloz_OK(events, pww.PRZYCISK_OK)
-        obsloz_zamkniecie(events)
-    surface.fill(pygame.color.THECOLORS['black'])
-    pygame.display.flip()
+
+def uruchom_gre(surface):
     plansza_gry = plansza.Plansza(surface, *pwm.PLANSZA_ROZMIAR)
     siatka.WYGRYWAJACYCH = pwm.WYGRYWAJACYCH
     grafika.rysuj_siatke(pwm.PLANSZA_ROZMIAR, surface)
     ox15.gra(pwm.GRACZ1, pwm.GRACZ2, plansza_gry)
+
+def pokaz_wybory():
+    surface = pygame.display.set_mode(pww.ROZMIAR)
+    przygotuj_formatki(surface)
+    while not pwm.zatwierdzono_wybor:
+        wybierz_opcje()
+    surface.fill(pygame.color.THECOLORS['black'])
+    pygame.display.flip()
+    uruchom_gre(surface)
 
 
 if __name__ == "__main__":
