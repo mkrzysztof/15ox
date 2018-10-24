@@ -32,15 +32,18 @@ def uruchom_gre(surface):
     grafika.rysuj_siatke(pwm.PLANSZA_ROZMIAR, surface)
     ox15.gra(pwm.GRACZ1, pwm.GRACZ2, plansza_gry)
 
-def pokaz_wybory():
-    surface = pygame.display.set_mode(pww.ROZMIAR)
+def pokaz_wybory(surface):
+    surface.fill(pygame.color.THECOLORS['black'])
     przygotuj_formatki(surface)
     while not pwm.zatwierdzono_wybor:
         wybierz_opcje()
     surface.fill(pygame.color.THECOLORS['black'])
     pygame.display.flip()
     uruchom_gre(surface)
+    pwm.zatwierdzono_wybor = False
 
 
 if __name__ == "__main__":
-    pokaz_wybory()
+    surface = pygame.display.set_mode(pww.ROZMIAR)
+    while True:
+        pokaz_wybory(surface)
