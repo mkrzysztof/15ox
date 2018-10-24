@@ -13,37 +13,41 @@ import plansza_koncowa
 import time
 
 
+def czy_koniec(biezacy_gracz, remis):
+    return (biezacy_gracz.wygrana or biezacy_gracz.przeciwnik.wygrana or remis)
+
+def pokaz_wygrana(biezacy_gracz, plansza):
+    biezacy_gracz.ustaw_wygrana()
+    print(plansza.pola)
+    zarzadca.rozeslij('pokaz-wygrana', False, biezacy_gracz, plansza.surface)
+
+def pokaz_remis(biezacy_gracz, plansza):
+    remis = True
+    print("Remis")
+    zarzadca.rozeslij('pokaz-wygrana', remis, biezacy_gracz, plansza.surface)
+    return remis
+
+def zdecyduj_o_koncu(biezacy_gracz, polozenie, plansza):
+    """ zdecyduj no końcu dla bieżącego gracza na podstawie ostatniego 
+    położenia dla danej planszy """
+    remis = False
+    if plansza.ma_uklad_wygrywajacy(polozenie):
+        pokaz_wygrana(biezacy_gracz, plansza)
+    elif plansza.jest_zapelniona():
+        remis = pokaz_remis(biezacy_gracz, plansza)
+    else:
+        biezacy_gracz = biezacy_gracz.przeciwnik
+    return biezacy_gracz, remis
+
 def gra(pierwszy_gracz, drugi_gracz, plansza):
     """Główna procedura rozgrywki"""
-    # dopuki któryś z graczy nie wygra lub jest remis:\
-    # bieżący gracz stawia swój symbol na wolnym polu planszsy\
-    # jeżeli wykryrto układ wygrywający zgłoś wygraną bieżącego gracza\
-    # w pp jeśli plansza zapełniona zgłoś remis\
-    # w pp zmień bieżącego gracza
     remis = False
-    biezacy_gracz = pierwszy_gracz
-    def zdecyduj_o_koncu():
-        nonlocal biezacy_gracz, remis
-        if plansza.ma_uklad_wygrywajacy(polozenie):
-            biezacy_gracz.ustaw_wygrana()
-            print(plansza.pola)
-            zarzadca.rozeslij('pokaz-wygrana', remis, biezacy_gracz,
-                              plansza.surface)
-        elif plansza.jest_zapelniona():
-            remis = True
-            print("Remis")
-            zarzadca.rozeslij('pokaz-wygrana', remis, biezacy_gracz,
-                              plansza.surface)
-        else:
-            biezacy_gracz = biezacy_gracz.przeciwnik
-
-    def czy_koniec():
-        return (pierwszy_gracz.wygrana or drugi_gracz.wygrana or remis)
-            
-    while not czy_koniec():
+    biezacy_gracz = pierwszy_gracz        
+    while not czy_koniec(biezacy_gracz, remis):
         zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
-        zdecyduj_o_koncu()
+        biezacy_gracz, remis = zdecyduj_o_koncu(biezacy_gracz, polozenie,
+                                                plansza)
     # pauza
     time.sleep(5.5)
 
