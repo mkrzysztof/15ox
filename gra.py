@@ -33,11 +33,12 @@ def uruchom_gre(surface):
     ox15.gra(pwm.GRACZ1, pwm.GRACZ2, plansza_gry)
 
 def pokaz_wybory(surface):
-    surface.fill(pygame.color.THECOLORS['black'])
+    kolor_czarny = pygame.color.THECOLORS['black']
+    surface.fill(kolor_czarny)
     przygotuj_formatki(surface)
     while not pwm.zatwierdzono_wybor:
         wybierz_opcje()
-    surface.fill(pygame.color.THECOLORS['black'])
+    surface.fill(kolor_czarny)
     pygame.display.flip()
     uruchom_gre(surface)
     pwm.zatwierdzono_wybor = False
