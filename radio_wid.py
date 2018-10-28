@@ -28,14 +28,15 @@ def _dolacz_obsluge(opcje, pola, funkcja_obslugi):
         pola[opcja].dodaj_obsluge(opcja, funkcja_obslugi, opcja)
 
 def utworz_radio(opcje, pola, funkcja_obslugi,
-                     poz_x, poz_y, surface):
+                     pozycja, surface):
     """ tworzy zgrupowane pole wyboru typu 'radio' 
     Argumenty:
     opcje -- lista opisów
     pola -- lista pól typu PrzyciskiGraf
     funkcja_obslugi -- funkcja obsługująca utworzone pole radio
-    poz_x, poz_y -- pozycja na utworzonym oknie graficznym
+    pozycja -- pozycja na utworzonym oknie graficznym
     surface -- okno graficzne """
+    poz_x, poz_y = pozycja
     pozycje_radio = [(poz_x, poz_y + i * PIONOWY_ODSTEP)
                          for i in range(len(opcje))]
     _umiesc_radio(opcje, pola, pozycje_radio, surface)

@@ -8,6 +8,8 @@ import radio_wid
 import pygame
 import sys
 
+ROZMIAR = (800, 600)
+
 def obsloz_zamkniecie(events):
     for event in events:
         if event.type == pygame.QUIT:
@@ -44,6 +46,6 @@ def pokaz_wybory(surface):
 
 
 if __name__ == "__main__":
-    surface = pygame.display.set_mode(pww.ROZMIAR)
+    surface = pygame.display.set_mode(ROZMIAR)
     while True:
         pokaz_wybory(surface)
