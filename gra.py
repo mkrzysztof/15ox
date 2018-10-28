@@ -4,6 +4,7 @@ import grafika
 import ox15
 import plansza_wyboru_wid as pww
 import plansza_wyboru_mod as pwm
+import radio_wid
 import pygame
 import sys
 
@@ -14,17 +15,15 @@ def obsloz_zamkniecie(events):
 
 def wybierz_opcje():
     events = pygame.event.get()
-    pww.obsluz_przyciski(events, pww.PRZYCISKI_ZMIAN)
-    pww.obsluz_przyciski(events, pww.PRZYCISKI_KTO_GRA)
+    radio_wid.obsluz_radio(events, pww.PRZYCISKI_ZMIAN)
+    radio_wid.obsluz_radio(events, pww.PRZYCISKI_KTO_GRA)
     pww.obsloz_OK(events, pww.PRZYCISK_OK)
     obsloz_zamkniecie(events)
 
 def przygotuj_formatki(surface):
     pww.utworz_przyciski_rozm(surface)
-    pww.dodaj_napisy_rozm(surface)
-    pww.wyswietl_OK(surface)
     pww.utworz_przyciski_ile(surface)
-    pww.dodaj_napisy_ile(surface)
+    pww.wyswietl_OK(surface)
 
 def uruchom_gre(surface):
     plansza_gry = plansza.Plansza(surface, *pwm.PLANSZA_ROZMIAR)

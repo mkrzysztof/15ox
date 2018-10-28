@@ -1,8 +1,9 @@
 """ przyciski radio """
+import pygame
 
 PIONOWY_ODSTEP = 50
 
-def _obsluga_radio(funkcje_obslugi, pola, aktywna_opcja):
+def obsluga_radio(funkcje_obslugi, pola, aktywna_opcja):
     # aktywuje wybraną aktywną opcje, czyści przyciski nie związane
     # z tą opcją
     funkcje_obslugi[aktywna_opcja]()
@@ -26,13 +27,26 @@ def _dolacz_obsluge(opcje, pola, funkcja_obslugi):
     for opcja in opcje:
         pola[opcja].dodaj_obsluge(opcja, funkcja_obslugi, opcja)
 
-def obsluz_przyciski(events, pola):
-    for rozmiar, przycisk in pola.items():
-        przycisk.wykryj_klikniecie(events)
-
-def utworz_radio(opcje, przyciski, funkcja_obslugi,
+def utworz_radio(opcje, pola, funkcja_obslugi,
                      poz_x, poz_y, surface):
+    """ tworzy zgrupowane pole wyboru typu 'radio' 
+    Argumenty:
+    opcje -- lista opisów
+    pola -- lista pól typu PrzyciskiGraf
+    funkcja_obslugi -- funkcja obsługująca utworzone pole radio
+    poz_x, poz_y -- pozycja na utworzonym oknie graficznym
+    surface -- okno graficzne """
     pozycje_radio = [(poz_x, poz_y + i * PIONOWY_ODSTEP)
                          for i in range(len(opcje))]
-    _umiesc_radio(opcje, przyciski, pozycje_radio, surface)
-    _dolacz_obsluge(opcje, przyciski, funkcja_obslugi)
+    _umiesc_radio(opcje, pola, pozycje_radio, surface)
+    _dolacz_obsluge(opcje, pola, funkcja_obslugi)
+
+def dodaj_napisy(pozycja, opcje, surface):
+    poz_x_napisu, poz_y_napisu = pozycja
+    pozycje_napisow = [(poz_x_napisu, poz_y_napisu + i * PIONOWY_ODSTEP)
+                       for i in range(len(opcje))]
+    _umiesc_napisy(opcje, pozycje_napisow, surface)
+
+def obsluz_radio(events, pola):
+    for rozmiar, pole in pola.items():
+        pole.wykryj_klikniecie(events)
