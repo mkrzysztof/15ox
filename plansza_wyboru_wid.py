@@ -2,6 +2,7 @@
 import pygame
 import plansza_wyboru_mod as pwm
 import zaznaczenie
+import radio_wid
 
 #stałe
 ROZMIAR = (800, 600)
@@ -60,7 +61,8 @@ def utworz_przyciski_rozm(surface):
     def _funkcja_obslugi_roz(rozmiar):
         _obsluga_radio(FUN_WYBOROW, PRZYCISKI_ZMIAN, rozmiar)
 
-    utworz_przyciski(ROZMIARY_PLANSZY, PRZYCISKI_ZMIAN, _funkcja_obslugi_roz,
+    radio_wid.utworz_radio(ROZMIARY_PLANSZY, PRZYCISKI_ZMIAN,
+                           _funkcja_obslugi_roz,
                      50, POZ_Y_POCZATKOWA, surface)
 
 def dodaj_napisy(pozycja, opcje, surface):
@@ -91,7 +93,7 @@ def utworz_przyciski_ile(surface):
     def _funkcja_obslugi_ile(kto):
         _obsluga_radio(FUN_KTO_GRA, PRZYCISKI_KTO_GRA, kto)
 
-    utworz_przyciski(KTO_GRA, PRZYCISKI_KTO_GRA, _funkcja_obslugi_ile,
+    radio_wid.utworz_radio(KTO_GRA, PRZYCISKI_KTO_GRA, _funkcja_obslugi_ile,
                      180, POZ_Y_POCZATKOWA, surface)
 
 def dodaj_napisy_ile(surface):
