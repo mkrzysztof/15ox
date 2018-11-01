@@ -20,7 +20,7 @@ _FUN_KTO_GRA = dict(zip(_KTO_GRA, _WYBOR_KTO_GRA))
 
 PRZYCISK_OK = zaznaczenie.PrzyciskOK()
 
-def utworz_pole_radio(pola_radio, poz_x, funkcja_obslugi, surface):
+def _utworz_pole_radio(pola_radio, poz_x, funkcja_obslugi, surface):
     ODSTEP = 70
     pozycja = (poz_x, _POZ_Y_POCZATKOWA)
     radio_wid.utworz_radio(pola_radio, funkcja_obslugi,
@@ -32,7 +32,10 @@ def _funkcja_obslugi_roz(rozmiar):
     radio_wid.obsluga_radio(_FUN_WYBOROW, PRZYCISKI_ZMIAN, rozmiar)
         
 def utworz_przyciski_rozm(surface):
-    utworz_pole_radio(PRZYCISKI_ZMIAN, 50, _funkcja_obslugi_roz, surface)
+    _utworz_pole_radio(PRZYCISKI_ZMIAN, 50, _funkcja_obslugi_roz, surface)
+
+def obsluz_przyciski_rozm(events):
+    radio_wid.obsluz_radio(events, PRZYCISKI_ZMIAN)
         
 # przyciski wybór ilości
 
@@ -40,8 +43,10 @@ def _funkcja_obslugi_ile(kto):
     radio_wid.obsluga_radio(_FUN_KTO_GRA, PRZYCISKI_KTO_GRA, kto)
 
 def utworz_przyciski_ile(surface):
-    utworz_pole_radio(PRZYCISKI_KTO_GRA, 180, _funkcja_obslugi_ile, surface)
-    
+    _utworz_pole_radio(PRZYCISKI_KTO_GRA, 180, _funkcja_obslugi_ile, surface)
+
+def obsluz_przyciski_ile(events):
+    radio_wid.obsluz_radio(events, PRZYCISKI_KTO_GRA)
 
 # przycisk OK
 
