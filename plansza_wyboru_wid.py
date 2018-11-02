@@ -72,9 +72,6 @@ def wyswietl_PRZERWIJ(surface):
     PRZYCISK_PRZERWIJ.dodaj_obsluge("PRZERWIJ", _funkcja_obslugi_PRZERWIJ,
                                     None)
 
-def obsloz_PRZERWIJ(events):
-    PRZYCISK_PRZERWIJ.wykryj_klikniecie(events)
-
 #
 def _obsluz_klikniecie_na_siatce(events):
     wyj = False
@@ -88,7 +85,7 @@ def _obsluz_klikniecie_na_siatce(events):
 
 def czy_zatwierdzono_pozycje(events):
     wyj = False
-    obsloz_PRZERWIJ(events)
+    PRZYCISK_PRZERWIJ.wykryj_klikniecie(events)
     if not pwm.przerwano:
         wyj = _obsluz_klikniecie_na_siatce(events)
     else:

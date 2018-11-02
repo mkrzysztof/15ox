@@ -3,6 +3,7 @@ wyłączyć go można jedynie z zewnątrz"""
 import pygame
 import zarzadca
 import plansza_wyboru_mod as pwm
+import monitoring
 
 pygame.font.init()
 WIELKOSC = 30
@@ -38,6 +39,7 @@ class Przycisk:
         self.surface.blit(ODZNACZONY, (x, y))
         pygame.display.flip()
 
+    @monitoring.pokaz_wywolanie
     def czy_kliknieto(self, event):
         kliknieto = False
         zajmowany_obszar = self.zajmowany_obszar
@@ -126,8 +128,8 @@ class PrzyciskPrzerwij:
         self.surface.blit(PRZERWIJ, (x, y))
         pygame.display.flip()
 
+    @monitoring.pokaz_wywolanie
     def wykryj_klikniecie(self, pygame_events):
         for event in pygame_events:
             if self.przycisk.czy_kliknieto(event):
-                print('cccc')
                 pwm.przerwano = True

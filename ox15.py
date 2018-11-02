@@ -13,7 +13,7 @@ def _czy_koniec(biezacy_gracz, remis):
     return (biezacy_gracz.wygrana or biezacy_gracz.przeciwnik.wygrana or remis)
 
 def _zaznacz_przerwij_zatrzymaj():
-    pwm.przerwano = True
+    # pwm.przerwano = True
     time.sleep(3)
 
 def _pokaz_wygrana(biezacy_gracz, plansza):
@@ -44,8 +44,9 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
     remis = False
     biezacy_gracz = pierwszy_gracz
     pwm.przerwano = False
-    while not _czy_koniec(biezacy_gracz, remis) and not pwm.przerwano:
+    while not (_czy_koniec(biezacy_gracz, remis) or pwm.przerwano):
         zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
-        biezacy_gracz, remis = _zdecyduj_o_koncu(biezacy_gracz, polozenie,
-                                                plansza)
+        if not pwm.przerwano:
+            biezacy_gracz, remis = _zdecyduj_o_koncu(biezacy_gracz, polozenie,
+                                                     plansza)
