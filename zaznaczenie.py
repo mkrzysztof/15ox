@@ -11,6 +11,7 @@ KOLOR = pygame.color.THECOLORS["white"]
 _ZAZNACZONY = pygame.image.load('zaznaczony.png')
 ODZNACZONY = pygame.image.load('odznaczony.png')
 OK = pygame.image.load('OK.png')
+PRZERWIJ = pygame.image.load('przerwij.png')
 
 
 class Przycisk:
@@ -110,3 +111,23 @@ class PrzyciskOK:
             if self.przycisk.czy_kliknieto(event):
                 pwm.zatwierdzono_wybor = True
         
+
+class PrzyciskPrzerwij:
+    def __init__(self):
+        self.przycisk = Przycisk()
+
+    def dodaj_obsluge(self, komunikat, funkcja_zwrotna, *parametry):
+        self.przycisk.dodaj_obsluge(komunikat, funkcja_zwrotna, *parametry)
+
+    def umiesc_na_pozycji(self, x, y, surface):
+        self.surface = surface
+        self.przycisk.zajmowany_obszar = pygame.Rect(x, y,
+                                                     *PRZERWIJ.get_size())
+        self.surface.blit(PRZERWIJ, (x, y))
+        pygame.display.flip()
+
+    def wykryj_klikniecie(self, pygame_events):
+        for event in pygame_events:
+            if self.przycisk.czy_kliknieto(event):
+                print('cccc')
+                pwm.przerwano = True

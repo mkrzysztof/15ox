@@ -19,7 +19,7 @@ def _wybierz_opcje():
     events = pygame.event.get()
     pww.obsluz_przyciski_rozm(events)
     pww.obsluz_przyciski_ile(events)
-    pww.obsloz_OK(events, pww.PRZYCISK_OK)
+    pww.obsloz_OK(events)
     _obsloz_zamkniecie(events)
 
 def _przygotuj_formatki(surface):
@@ -30,6 +30,7 @@ def _przygotuj_formatki(surface):
 def _uruchom_gre(surface):
     plansza_gry = plansza.Plansza(surface, *pwm.PLANSZA_ROZMIAR)
     siatka.WYGRYWAJACYCH = pwm.WYGRYWAJACYCH
+    pww.wyswietl_PRZERWIJ(surface)
     grafika.rysuj_siatke(pwm.PLANSZA_ROZMIAR, surface)
     ox15.gra(pwm.GRACZ1, pwm.GRACZ2, plansza_gry)
 

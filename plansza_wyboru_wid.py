@@ -3,6 +3,7 @@ import pygame
 import plansza_wyboru_mod as pwm
 import zaznaczenie
 import radio_wid
+import sys
 
 #stałe
 
@@ -19,6 +20,7 @@ _WYBOR_KTO_GRA = [pwm.wybierz_gracz_gracz, pwm.wybierz_komputer_gracz,
 _FUN_KTO_GRA = dict(zip(_KTO_GRA, _WYBOR_KTO_GRA))
 
 PRZYCISK_OK = zaznaczenie.PrzyciskOK()
+PRZYCISK_PRZERWIJ = zaznaczenie.PrzyciskPrzerwij()
 
 def _utworz_pole_radio(pola_radio, poz_x, funkcja_obslugi, surface):
     ODSTEP = 70
@@ -57,5 +59,34 @@ def wyswietl_OK(surface):
     PRZYCISK_OK.umiesc_na_pozycji(200, 200, surface)
     PRZYCISK_OK.dodaj_obsluge("OK", _funkcja_obslugi_OK, None)
 
-def obsloz_OK(events, PRZYCISK_OK):
+def obsloz_OK(events):
     PRZYCISK_OK.wykryj_klikniecie(events)
+
+# przycisk PRZERWIJ
+
+def _funkcja_obslugi_PRZERWIJ():
+    pwm.przerwano = True
+
+def wyswietl_PRZERWIJ(surface):
+    PRZYCISK_PRZERWIJ.umiesc_na_pozycji(200, 200, surface)
+    PRZYCISK_PRZERWIJ.dodaj_obsluge("PRZERWIJ", _funkcja_obslugi_PRZERWIJ,
+                                    None)
+
+def obsloz_PRZERWIJ(events):
+    PRZYCISK_PRZERWIJ.wykryj_klikniecie(events)
+
+#
+
+def czy_zatwierdzono_pozycje(events):
+    wyj = False
+    obsloz_PRZERWIJ(events)
+    if not pwm.przerwano:
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                wyj = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit(0)
+    else:
+        wyj = True
+    return wyj

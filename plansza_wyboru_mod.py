@@ -11,6 +11,7 @@ GRACZ1.przeciwnik = GRACZ2
 GRACZ2.przeciwnik = GRACZ1
 
 zatwierdzono_wybor = False
+przerwano = False
 
 def wybierz_xo():
     """klasyczna gra w kółko i krzyżyk na planszy 3x3"""

@@ -3,6 +3,7 @@ import siatka
 import symbol
 import zarzadca
 import sys
+import plansza_wyboru_wid as pww
 
 # stałe
 WIELKOSC = 20  # liczba pixeli przypadających na komórkę
@@ -101,18 +102,6 @@ def rysuj_siatke(plansza_rozmiar, surface):
     rysuj_linie_pionowe(kolumny, surface)
     pygame.display.flip()
 
-
-def czy_zatwierdzono_pozycje(events):
-    wyj = False
-    for event in events:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            wyj = True
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit(0)
-    return wyj
-
-
 def odczyt_poz_myszy():
     zatwierdzono = False
     zegar = pygame.time.Clock()
@@ -120,7 +109,7 @@ def odczyt_poz_myszy():
         poz = pygame.mouse.get_pos()
         poz = [poz[1] - POCZATEK[1], poz[0] - POCZATEK[0]]
         poz_w = [x // (WIELKOSC + 1) for x in poz]
-        zatwierdzono = czy_zatwierdzono_pozycje(pygame.event.get())
+        zatwierdzono = pww.czy_zatwierdzono_pozycje(pygame.event.get())
         zegar.tick(40)
     return siatka.Polozenie(*poz_w)
 
