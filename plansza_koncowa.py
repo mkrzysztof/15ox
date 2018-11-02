@@ -13,5 +13,3 @@ def pokaz_wygrana(remis, biezacy_gracz, surface):
     napis = font.render(napis_wygrana, False, pygame.color.THECOLORS['red'])
     surface.blit(napis, (100, 100))
     pygame.display.flip()
-    
-zarzadca.zarejestruj('pokaz-wygrana', pokaz_wygrana)
