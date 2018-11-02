@@ -4,18 +4,27 @@ import plansza
 import zarzadca
 import plansza_wyboru_mod as pwm
 import time
+import plansza_koncowa
+import zarzadca
 
+zarzadca.zarejestruj('pokaz-wygrana', plansza_koncowa.pokaz_wygrana)
 
 def _czy_koniec(biezacy_gracz, remis):
     return (biezacy_gracz.wygrana or biezacy_gracz.przeciwnik.wygrana or remis)
 
+def _zaznacz_przerwij_zatrzymaj():
+    pwm.przerwano = True
+    time.sleep(3)
+
 def _pokaz_wygrana(biezacy_gracz, plansza):
     biezacy_gracz.ustaw_wygrana()
     zarzadca.rozeslij('pokaz-wygrana', False, biezacy_gracz, plansza.surface)
+    _zaznacz_przerwij_zatrzymaj()
 
 def _pokaz_remis(biezacy_gracz, plansza):
     remis = True
     zarzadca.rozeslij('pokaz-wygrana', remis, biezacy_gracz, plansza.surface)
+    _zaznacz_przerwij_zatrzymaj()
     return remis
 
 def _zdecyduj_o_koncu(biezacy_gracz, polozenie, plansza):
@@ -24,12 +33,8 @@ def _zdecyduj_o_koncu(biezacy_gracz, polozenie, plansza):
     remis = False
     if plansza.ma_uklad_wygrywajacy(polozenie):
         _pokaz_wygrana(biezacy_gracz, plansza)
-        pwm.przerwano = True
-        time.sleep(3)
     elif plansza.jest_zapelniona():
         remis = _pokaz_remis(biezacy_gracz, plansza)
-        pwm.przerwano = True
-        time.sleep(3)
     else:
         biezacy_gracz = biezacy_gracz.przeciwnik
     return biezacy_gracz, remis
