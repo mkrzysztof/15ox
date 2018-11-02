@@ -1,4 +1,4 @@
-"""zawiera ustawienia gry"""
+"""zawiera początkowe ustawienia gry"""
 import gracz
 import symbol
 import gracz_komputer

@@ -1,15 +1,8 @@
 """Gra"""
 import pygame
-import siatka
 import plansza
-import symbol
-import gracz
-import grafika
 import zarzadca
-import gracz_komputer
 import plansza_wyboru_mod as pwm
-from monitoring import pokaz_wywolanie
-import plansza_koncowa
 import time
 
 
@@ -51,4 +44,3 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
         biezacy_gracz, remis = _zdecyduj_o_koncu(biezacy_gracz, polozenie,
                                                 plansza)
-        

@@ -76,17 +76,21 @@ def obsloz_PRZERWIJ(events):
     PRZYCISK_PRZERWIJ.wykryj_klikniecie(events)
 
 #
+def _obsluz_klikniecie_na_siatce(events):
+    wyj = False
+    for event in events:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            wyj = True
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit(0)
+    return wyj
 
 def czy_zatwierdzono_pozycje(events):
     wyj = False
     obsloz_PRZERWIJ(events)
     if not pwm.przerwano:
-        for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                wyj = True
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit(0)
+        wyj = _obsluz_klikniecie_na_siatce(events)
     else:
         wyj = True
     return wyj

@@ -1,5 +1,3 @@
-#import grafika
-import plansza
 import zarzadca
 
 
