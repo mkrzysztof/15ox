@@ -2,6 +2,17 @@ import drzewo
 import siatka
 import gracz
 
+
+def dodaj_ruch_na_siatce(wierzcholek, siatka, ruch, gracz):
+    """ dodaje do wierczhołka element odpowiadający ruchowi na 
+    siatce nim etykietowany zwraca ten wierzcholek dla gracza"""
+    nastepna_siatka = siatka.copy()
+    przeciwnik = gracz.przeciwnik
+    nastepna_siatka.zapis_polozenie(ruch, przeciwnik.symbol)
+    pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, przeciwnik)
+    wierzcholek.dodaj(ruch, pod_wierzcholek)
+    return pod_wierzcholek
+
 def buduj_drzewo(stan_siatki, gracz_aktywny):
     przeciwnik = gracz_aktywny.przeciwnik
     glebokosc = 0
@@ -25,28 +36,30 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
         else:
             wolne_pola = siatka.wolne_pola()
         for ruch in wolne_pola:
-            nastepna_siatka = siatka.copy()
-            nastepna_siatka.zapis_polozenie(ruch, gracz.przeciwnik.symbol)
-            pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka,
-                                                 gracz.przeciwnik)
-            wierzcholek.dodaj(ruch, pod_wierzcholek)
+            pod_wierzcholek = dodaj_ruch_na_siatce(wierzcholek, siatka, ruch,
+                                                   gracz)
             element = (pod_wierzcholek, ruch, glebokosc)
             stos.append(element)
         wierzcholek.siatka = None
     return wierzch_wyj
 
+def klucz(x):
+    return x[1]
+
 def min_max(wierzcholek, gracz_aktywny):
     wartosc = wierzcholek.wartosc
     ruch = None
+    fun_por = None
+    if wierzcholek.gracz != gracz_aktywny:
+        fun_por = max
+    else:
+        fun_por = min
     if wartosc is None:
         wartosci = {}
         for ruch in wierzcholek.keys():
             dziecko = wierzcholek.odczytaj(ruch)
             dziecko.wartosc = min_max(dziecko, gracz_aktywny)[1]
             wartosci[ruch] = dziecko.wartosc
-        if wierzcholek.gracz != gracz_aktywny:
-            ruch, wartosc = max(wartosci.items(), key = lambda x: x[1])
-        else:
-            ruch, wartosc = min(wartosci.items(), key = lambda x: x[1])
+        ruch, wartosc = fun_por(wartosci.items(), key = klucz)
         wierzcholek.wartosc = wartosc
     return (ruch, wartosc)
