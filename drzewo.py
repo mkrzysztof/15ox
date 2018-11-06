@@ -5,10 +5,10 @@ class Wierzcholek:
         self.wartosc = None
         self.__dzieci = {}
 
-    def dodaj(self, klucz, wierzcholek):
+    def __setitem__(self, klucz, wierzcholek):
         self.__dzieci[klucz] = wierzcholek
 
-    def odczytaj(self, klucz):
+    def __getitem__(self, klucz):
         return self.__dzieci[klucz]
 
     def keys(self):

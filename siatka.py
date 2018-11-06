@@ -104,8 +104,9 @@ class Siatka:
     def copy(self):
         """kopia ale tylko pola pola"""
         wyjscie = Siatka(self.wierszy, self.kolumn)
+        wyj_pola = wyjscie.pola
         for numer, wiersz in enumerate(self.pola):
-            wyjscie.pola[numer] = wiersz.copy()
+            wyj_pola[numer] = wiersz[:]
         return wyjscie
 
     def odczyt_polozenie(self, polozenie):
