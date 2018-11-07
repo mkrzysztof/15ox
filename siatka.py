@@ -1,16 +1,28 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
 import itertools
 import symbol
+import enum
 
 #stałe
 #WIERSZ = 0
 #KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
+class Kierunek(enum.Enum):
+    LEWO  = (0, -1)
+    PRAWO = (0, 1)
+    GORA  = (-1, 0)
+    DOL   = (1, 0)
+    LEWO_GORA = (-1, -1)
+    LEWO_DOL = (1, -1)
+    PRAWO_GORA = (-1, 1)
+    PRAWO_DOL = (1, 1)
+
 class Polozenie(object):
     """reprezentuje położenie (wiersz, kolumna) """
 
     __slots__ = ['poz']
+    x = 1
 
     def __init__(self, wiersz, kolumna):
         self.poz = (wiersz, kolumna)
@@ -21,64 +33,59 @@ class Polozenie(object):
     def __eq__(self, other):
         return self.poz == other.poz
 
+    def __add__(self, przesuniecie):
+        # przesuniecie to (x,y)
+        tr_wiersz, tr_kolumna = przesuniecie
+        wiersz, kolumna = self
+        return Polozenie(wiersz + tr_wiersz, kolumna + tr_kolumna)
+
     def w_lewo(self):
         """zwraca nowe położenie przesunięte w lewo"""
-        wiersz, kolumna = self.poz
-        return Polozenie(wiersz, kolumna - 1)
+        return self + Kierunek.LEWO.value
 
     def w_prawo(self):
         """zwraca nowe położenie przesunięte w prawo"""
-        wiersz, kolumna = self.poz
-        return Polozenie(wiersz, kolumna + 1)
-
+        return self + Kierunek.PRAWO.value
+    
     def w_gore(self):
         """zwraca nowe położenie przesunięte w górę"""
-        wiersz, kolumna = self.poz
-        return Polozenie(wiersz - 1, kolumna)
-
+        return self + Kierunek.GORA.value
 
     def w_dol(self):
         """zwraca nowe położenie przesunięte w dół"""
-        wiersz, kolumna = self.poz
-        return Polozenie(wiersz + 1, kolumna)
+        return self + Kierunek.DOL.value
 
     def w_lewo_gore(self):
         """zwraca nowe położenie przesunięte w lewo i w górę"""
-        return self.w_lewo().w_gore()
+        return self + Kierunek.LEWO_GORA.value
 
     def w_lewo_dol(self):
         """zwraca nowe położenie przesunięte w lewo i  w dół"""
-        return self.w_lewo().w_dol()
+        return self + Kierunek.LEWO_DOL.value
 
     def w_prawo_gore(self):
         """zwraca nowe położenie przesunięte w prawo i w górę"""
-        return self.w_prawo().w_gore()
+        return self + Kierunek.PRAWO_GORA.value
 
     def w_prawo_dol(self):
         """zwraca nowe położenie przesunięte w prawo i w dół"""
-        return self.w_prawo().w_dol()
+        return self + Kierunek.PRAWO_DOL.value
 
     def __getitem__(self, key):
         return self.poz[key]
 
-    def nie_wychodzi_poza(self, siatka):
-        """ sprawdza czy położenie wychodzi poza planszę """
-        wiersz, kolumna = self
-        return 0 <= wiersz < siatka.wierszy and 0 <= kolumna < siatka.kolumn
-
-    # def jest_puste(self, siatka):
-    #     """ sprawdza czy polozenie na plansza jest puste """
-    #     return siatka[self] == symbol.Puste
-
+_wszystkie = None
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
     def __init__(self, wierszy=15, kolumn=15):
+        global _wszystkie
         self.pola = {}
-        lista_polozen = itertools.product(range(wierszy), range(kolumn))
-        for polozenie in lista_polozen:
-            self.pola[Polozenie(*polozenie)] = symbol.Puste
         self.wierszy = wierszy
         self.kolumn = kolumn
+        self._liczba_pol = kolumn * wierszy
+        if _wszystkie is None:
+            _wszystkie = list(itertools.product(range(self.wierszy),
+                                            range(self.kolumn)))
 
     def __repr_wiersz(self, num_wiersz):
         return [self[Polozenie(num_wiersz, num_kol)].repr
@@ -90,6 +97,11 @@ class Siatka:
             bufor.extend(self.__repr_wiersz(num_wiersza))
             bufor.append("\n")
         return "".join(bufor)
+
+    def zawiera_polozenie(self, polozenie):
+        """czy dane położenie znajduje się na siatce czy poza nią"""
+        wiersz, kolumna = polozenie
+        return 0 <= wiersz < self.wierszy and 0 <= kolumna < self.kolumn
 
     __slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
     def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
@@ -119,8 +131,8 @@ class Siatka:
         wyjscie.pola = self.pola.copy()
         return wyjscie
 
-    def __getitem__(self, polozenie):
-        return self.pola[polozenie]
+    def __getitem__(self, polozenie):     
+        return self.pola.get(polozenie, symbol.Puste)
 
     def __setitem__(self, polozenie, symbol_gracza):
         self.pola[polozenie] = symbol_gracza
@@ -140,12 +152,12 @@ class Siatka:
 
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
-        zap = True
-        for polozenie in self.pola.keys():
-            zap = zap and (self.pola[polozenie] != symbol.Puste)
-            if not zap:
-                break
-        return zap
+        pola = self.pola
+        ile_zapelnionych = 0
+        # policz zapełnione pola
+        for pole in pola:
+            ile_zapelnionych += 1
+        return ile_zapelnionych == self._liczba_pol
 
     def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
                                             kierunki):
@@ -179,7 +191,7 @@ class Siatka:
 
     def wolne_pola(self):
         """ zwraca generator wolnych pól (Polozenie) siatki """
-        wszystkie = itertools.product(range(self.wierszy), range(self.kolumn))
+        wszystkie = _wszystkie
         for para in wszystkie:
             ruch = Polozenie(*para)
             if not self.__zajeta(ruch):
@@ -198,7 +210,7 @@ class Siatka:
                                      kierunek):
         licznik = 0
         idz_w_kierunku = Siatka.__kierunki[kierunek]
-        while polozenie.nie_wychodzi_poza(self):
+        while self.zawiera_polozenie(polozenie):
             if self[polozenie] == symbol_gracza:
                 licznik += 1
                 polozenie = idz_w_kierunku(polozenie)

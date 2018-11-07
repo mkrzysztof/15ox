@@ -31,7 +31,7 @@ class GraczCzlowiek(Gracz):
         zla_pozycja = True
         while zla_pozycja:
             polozenie = grafika.odczyt_poz_myszy()
-            if (polozenie.nie_wychodzi_poza(siatka)
+            if (siatka.zawiera_polozenie(polozenie)
                     and siatka[polozenie] == symbol.Puste):
                 zla_pozycja = False
         return polozenie
