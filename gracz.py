@@ -1,5 +1,5 @@
 import grafika
-
+import symbol 
 class Gracz(object):
     """Klasa abstrakcyjna reprezentująca dowoilnego gracza"""
     def __init__(self, symbol, nazwa="GRACZ"):
@@ -32,7 +32,7 @@ class GraczCzlowiek(Gracz):
         while zla_pozycja:
             polozenie = grafika.odczyt_poz_myszy()
             if (polozenie.nie_wychodzi_poza(siatka)
-                    and polozenie.jest_puste(siatka)):
+                    and siatka[polozenie] == symbol.Puste):
                 zla_pozycja = False
         return polozenie
 

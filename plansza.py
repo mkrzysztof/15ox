@@ -11,9 +11,8 @@ class Plansza:
         self.kolumn = kolumn
         self.surface = surface
 
-    def zapis_polozenie(self, polozenie, symbol):
-        """postawienie symbol na Plansza na polozenie"""
-        self.pola.zapis_polozenie(polozenie, symbol)
+    def __setitem__(self, polozenie, symbol):
+        self.pola[polozenie] = symbol
 
     def jest_zapelniona(self):
         return self.pola.jest_zapelniona()

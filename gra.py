@@ -1,3 +1,4 @@
+import sys
 import siatka
 import plansza
 import grafika
@@ -5,7 +6,6 @@ import ox15
 import plansza_wyboru_wid as pww
 import plansza_wyboru_mod as pwm
 import pygame
-import sys
 
 def obsloz_zamkniecie(events):
     for event in events:
@@ -30,7 +30,8 @@ def uruchom_gre(surface):
     plansza_gry = plansza.Plansza(surface, *pwm.PLANSZA_ROZMIAR)
     siatka.WYGRYWAJACYCH = pwm.WYGRYWAJACYCH
     grafika.rysuj_siatke(pwm.PLANSZA_ROZMIAR, surface)
-    ox15.gra(pwm.GRACZ1, pwm.GRACZ2, plansza_gry)
+    ox15.gra(pwm.GRACZ1, plansza_gry)
+    print(plansza_gry.pola)
 
 def pokaz_wybory(surface):
     kolor_czarny = pygame.color.THECOLORS['black']

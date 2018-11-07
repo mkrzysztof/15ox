@@ -1,5 +1,3 @@
-#import grafika
-import plansza
 import zarzadca
 
 
@@ -13,7 +11,7 @@ class Symbol(object):
     def postaw_na_planszy(cls, plansza, polozenie):
         """postaw na planszy symbol na pozycji"""
         pozycja = tuple(polozenie)
-        plansza.zapis_polozenie(polozenie, cls)
+        plansza[polozenie] = cls
         zarzadca.rozeslij(cls.komunikat, cls, pozycja, plansza.surface)
 
 class Kolko(Symbol):

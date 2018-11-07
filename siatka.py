@@ -3,34 +3,44 @@ import itertools
 import symbol
 
 #stałe
-WIERSZ = 0
-KOLUMNA = 1
+#WIERSZ = 0
+#KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
 class Polozenie(object):
     """reprezentuje położenie (wiersz, kolumna) """
+
+    __slots__ = ['poz']
+
     def __init__(self, wiersz, kolumna):
         self.poz = (wiersz, kolumna)
 
-    def __str__(self):
-        return str(self.poz)
+    def __hash__(self):
+        return hash(self.poz)
+
+    def __eq__(self, other):
+        return self.poz == other.poz
 
     def w_lewo(self):
         """zwraca nowe położenie przesunięte w lewo"""
-        return Polozenie(self.poz[WIERSZ], self.poz[KOLUMNA] - 1)
+        wiersz, kolumna = self.poz
+        return Polozenie(wiersz, kolumna - 1)
 
     def w_prawo(self):
         """zwraca nowe położenie przesunięte w prawo"""
-        return Polozenie(self.poz[WIERSZ], self.poz[KOLUMNA] + 1)
+        wiersz, kolumna = self.poz
+        return Polozenie(wiersz, kolumna + 1)
 
     def w_gore(self):
         """zwraca nowe położenie przesunięte w górę"""
-        return Polozenie(self.poz[WIERSZ] - 1, self.poz[KOLUMNA])
+        wiersz, kolumna = self.poz
+        return Polozenie(wiersz - 1, kolumna)
 
 
     def w_dol(self):
         """zwraca nowe położenie przesunięte w dół"""
-        return Polozenie(self.poz[WIERSZ] + 1, self.poz[KOLUMNA])
+        wiersz, kolumna = self.poz
+        return Polozenie(wiersz + 1, kolumna)
 
     def w_lewo_gore(self):
         """zwraca nowe położenie przesunięte w lewo i w górę"""
@@ -52,24 +62,26 @@ class Polozenie(object):
         return self.poz[key]
 
     def nie_wychodzi_poza(self, siatka):
-        """ sprawdza xzy położenie wychodzi poza planszę """
-        return (0 <= self[WIERSZ] < siatka.wierszy
-                and 0 <= self[KOLUMNA] < siatka.kolumn)
+        """ sprawdza czy położenie wychodzi poza planszę """
+        wiersz, kolumna = self
+        return 0 <= wiersz < siatka.wierszy and 0 <= kolumna < siatka.kolumn
 
-    def jest_puste(self, siatka):
-        """ sprawdza czy polozenie na plansza jest puste """
-        return siatka.odczyt_polozenie(self) == symbol.Puste
+    # def jest_puste(self, siatka):
+    #     """ sprawdza czy polozenie na plansza jest puste """
+    #     return siatka[self] == symbol.Puste
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
     def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[symbol.Puste] * kolumn for y in range(wierszy)]
+        self.pola = {}
+        lista_polozen = itertools.product(range(wierszy), range(kolumn))
+        for polozenie in lista_polozen:
+            self.pola[Polozenie(*polozenie)] = symbol.Puste
         self.wierszy = wierszy
         self.kolumn = kolumn
 
-
     def __repr_wiersz(self, num_wiersz):
-        return [self.odczyt_polozenie(Polozenie(num_wiersz, num_kol)).repr
+        return [self[Polozenie(num_wiersz, num_kol)].repr
                 for num_kol in range(self.kolumn)]
 
     def __repr__(self):
@@ -104,21 +116,17 @@ class Siatka:
     def copy(self):
         """kopia ale tylko pola pola"""
         wyjscie = Siatka(self.wierszy, self.kolumn)
-        wyj_pola = wyjscie.pola
-        for numer, wiersz in enumerate(self.pola):
-            wyj_pola[numer] = wiersz[:]
+        wyjscie.pola = self.pola.copy()
         return wyjscie
 
-    def odczyt_polozenie(self, polozenie):
-        """odczytuje symbol z położenia"""
-        return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
+    def __getitem__(self, polozenie):
+        return self.pola[polozenie]
 
-    def zapis_polozenie(self, polozenie, symbol_gracza):
-        """stawia symbol na położenie"""
-        self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
+    def __setitem__(self, polozenie, symbol_gracza):
+        self.pola[polozenie] = symbol_gracza
 
     def __zajeta(self, polozenie):
-        odczytany_symbol = self.odczyt_polozenie(polozenie)
+        odczytany_symbol = self[polozenie]
         return odczytany_symbol != symbol.Puste
 
     @staticmethod
@@ -133,15 +141,15 @@ class Siatka:
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
         zap = True
-        for wiersz in self.pola:
-            zap = zap and (Siatka._wiersz_jest_zapelniony(wiersz))
+        for polozenie in self.pola.keys():
+            zap = zap and (self.pola[polozenie] != symbol.Puste)
             if not zap:
                 break
         return zap
 
     def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
                                             kierunki):
-        symbol_sprawdzany = self.odczyt_polozenie(polozenie)
+        symbol_sprawdzany = self[polozenie]
         #kierunek1
         licznik1 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                      polozenie,
@@ -191,7 +199,7 @@ class Siatka:
         licznik = 0
         idz_w_kierunku = Siatka.__kierunki[kierunek]
         while polozenie.nie_wychodzi_poza(self):
-            if self.odczyt_polozenie(polozenie) == symbol_gracza:
+            if self[polozenie] == symbol_gracza:
                 licznik += 1
                 polozenie = idz_w_kierunku(polozenie)
             else:
