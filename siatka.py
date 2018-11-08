@@ -2,13 +2,11 @@
 import itertools
 import symbol
 import enum
+import pygame
 
-#stałe
-#WIERSZ = 0
-#KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
-class Kierunek(enum.Enum):
+class Translacja(enum.Enum):
     LEWO  = (0, -1)
     PRAWO = (0, 1)
     GORA  = (-1, 0)
@@ -18,11 +16,16 @@ class Kierunek(enum.Enum):
     PRAWO_GORA = (-1, 1)
     PRAWO_DOL = (1, 1)
 
+class Strona(enum.Enum):
+    POZIOM = (Translacja.PRAWO, Translacja.LEWO)
+    PION   = (Translacja.DOL, Translacja.GORA)
+    LEWO   = (Translacja.PRAWO_DOL, Translacja.LEWO_GORA)
+    PRAWO  = (Translacja.LEWO_DOL, Translacja.PRAWO_GORA)
+
 class Polozenie(object):
     """reprezentuje położenie (wiersz, kolumna) """
 
     __slots__ = ['poz']
-    x = 1
 
     def __init__(self, wiersz, kolumna):
         self.poz = (wiersz, kolumna)
@@ -39,38 +42,6 @@ class Polozenie(object):
         wiersz, kolumna = self
         return Polozenie(wiersz + tr_wiersz, kolumna + tr_kolumna)
 
-    def w_lewo(self):
-        """zwraca nowe położenie przesunięte w lewo"""
-        return self + Kierunek.LEWO.value
-
-    def w_prawo(self):
-        """zwraca nowe położenie przesunięte w prawo"""
-        return self + Kierunek.PRAWO.value
-    
-    def w_gore(self):
-        """zwraca nowe położenie przesunięte w górę"""
-        return self + Kierunek.GORA.value
-
-    def w_dol(self):
-        """zwraca nowe położenie przesunięte w dół"""
-        return self + Kierunek.DOL.value
-
-    def w_lewo_gore(self):
-        """zwraca nowe położenie przesunięte w lewo i w górę"""
-        return self + Kierunek.LEWO_GORA.value
-
-    def w_lewo_dol(self):
-        """zwraca nowe położenie przesunięte w lewo i  w dół"""
-        return self + Kierunek.LEWO_DOL.value
-
-    def w_prawo_gore(self):
-        """zwraca nowe położenie przesunięte w prawo i w górę"""
-        return self + Kierunek.PRAWO_GORA.value
-
-    def w_prawo_dol(self):
-        """zwraca nowe położenie przesunięte w prawo i w dół"""
-        return self + Kierunek.PRAWO_DOL.value
-
     def __getitem__(self, key):
         return self.poz[key]
 
@@ -80,20 +51,23 @@ class Siatka:
     def __init__(self, wierszy=15, kolumn=15):
         global _wszystkie
         self.pola = {}
-        self.wierszy = wierszy
-        self.kolumn = kolumn
+        self.zb_kluczy = set()
+        self.rozmiar = (wierszy, kolumn)
+        self._rect = pygame.Rect((0, 0), self.rozmiar) 
         self._liczba_pol = kolumn * wierszy
         if _wszystkie is None:
-            _wszystkie = list(itertools.product(range(self.wierszy),
-                                            range(self.kolumn)))
+            _wszystkie = list(itertools.product(range(self.rozmiar[0]),
+                                            range(self.rozmiar[1])))
 
     def __repr_wiersz(self, num_wiersz):
+        _, kolumn = self.rozmiar
         return [self[Polozenie(num_wiersz, num_kol)].repr
-                for num_kol in range(self.kolumn)]
+                for num_kol in range(kolumn)]
 
     def __repr__(self):
         bufor = []
-        for num_wiersza in range(self.wierszy):
+        wierszy, _ = self.rozmiar
+        for num_wiersza in range(wierszy):
             bufor.extend(self.__repr_wiersz(num_wiersza))
             bufor.append("\n")
         return "".join(bufor)
@@ -101,13 +75,16 @@ class Siatka:
     def zawiera_polozenie(self, polozenie):
         """czy dane położenie znajduje się na siatce czy poza nią"""
         wiersz, kolumna = polozenie
-        return 0 <= wiersz < self.wierszy and 0 <= kolumna < self.kolumn
+        l_wierszy, l_kolumn = self.rozmiar
+        return (wiersz * (l_wierszy - 1 - wiersz) >= 0
+                and kolumna * (l_kolumn - 1 - kolumna) >= 0)
+        # return 0 <= wiersz < l_wierszy and 0 <= kolumna < l_kolumn
 
-    __slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
     def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
         bufor = []
+        slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
         for sym in linia:
-            bufor.append(Siatka.__slownik[sym])
+            bufor.append(slownik[sym])
         self.pola[numer_wiersza] = bufor
 
     def wypelnij_siatke(self, wzor):
@@ -127,15 +104,25 @@ class Siatka:
 
     def copy(self):
         """kopia ale tylko pola pola"""
-        wyjscie = Siatka(self.wierszy, self.kolumn)
+        wierszy, kolumn = self.rozmiar
+        wyjscie = Siatka(wierszy, kolumn)
         wyjscie.pola = self.pola.copy()
         return wyjscie
 
-    def __getitem__(self, polozenie):     
-        return self.pola.get(polozenie, symbol.Puste)
+    def __getitem__(self, polozenie):
+        # try:
+        #     wyj = self.pola[polozenie]
+        # except KeyError:
+        #     wyj = symbol.Puste
+        pola = self.pola
+        wyj = symbol.Puste
+        if polozenie in self.zb_kluczy:
+            wyj = pola[polozenie]
+        return wyj
 
     def __setitem__(self, polozenie, symbol_gracza):
         self.pola[polozenie] = symbol_gracza
+        self.zb_kluczy.add(polozenie)
 
     def __zajeta(self, polozenie):
         odczytany_symbol = self[polozenie]
@@ -159,32 +146,26 @@ class Siatka:
             ile_zapelnionych += 1
         return ile_zapelnionych == self._liczba_pol
 
-    def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
-                                            kierunki):
+    def __ma_uklad_wygrywajacy_dla_strony(self, arg_polozenie, strona):
+        polozenie = arg_polozenie
         symbol_sprawdzany = self[polozenie]
+        fun_zliczaj = self.__zliczaj_symbole_w_kierunku
+        strona0, strona1 = strona
+        licznik = 0
         #kierunek1
-        licznik1 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
-                                                     polozenie,
-                                                     kierunki[0])
+        licznik += fun_zliczaj(symbol_sprawdzany, polozenie, strona0)
         #kierunek2
-        polozenie = (Siatka.__kierunki[kierunki[1]])(polozenie)
-        licznik2 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
-                                                     polozenie,
-                                                     kierunki[1])
-        return (licznik1 + licznik2) >= WYGRYWAJACYCH
-    __strony = (('w_prawo', 'w_lewo'), #poziom
-                ('w_dol', 'w_gore'), #pion
-                ('w_prawo_dol', 'w_lewo_gore'), #ukos_lewy
-                ('w_lewo_dol', 'w_prawo_gore') #ukos_prawy
-               )
+        polozenie = polozenie + strona1.value
+        licznik += fun_zliczaj(symbol_sprawdzany, polozenie, strona1)
+        return licznik >= WYGRYWAJACYCH
 
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
         w 4 kierunkach
         """
         wyj = False
-        for kierunek in Siatka.__strony:
-            if self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie, kierunek):
+        for strona in Strona:
+            if self.__ma_uklad_wygrywajacy_dla_strony(polozenie, strona.value):
                 wyj = True
                 break
         return wyj
@@ -197,23 +178,14 @@ class Siatka:
             if not self.__zajeta(ruch):
                 yield ruch
 
-    __kierunki = {'w_lewo': Polozenie.w_lewo,
-                  'w_prawo': Polozenie.w_prawo,
-                  'w_dol' : Polozenie.w_dol,
-                  'w_gore': Polozenie.w_gore,
-                  'w_prawo_dol': Polozenie.w_prawo_dol,
-                  'w_lewo_gore': Polozenie.w_lewo_gore,
-                  'w_prawo_gore': Polozenie.w_prawo_gore,
-                  'w_lewo_dol': Polozenie.w_lewo_dol,}
-
-    def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
-                                     kierunek):
+    def __zliczaj_symbole_w_kierunku(self, symbol_gracza, arg_polozenie,
+                                     translacja):
         licznik = 0
-        idz_w_kierunku = Siatka.__kierunki[kierunek]
+        polozenie = arg_polozenie
         while self.zawiera_polozenie(polozenie):
             if self[polozenie] == symbol_gracza:
                 licznik += 1
-                polozenie = idz_w_kierunku(polozenie)
+                polozenie = polozenie + translacja.value
             else:
                 break
         return licznik
