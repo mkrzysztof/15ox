@@ -122,7 +122,7 @@ def odczyt_poz_myszy():
         poz_w = [x // (WIELKOSC + 1) for x in poz]
         zatwierdzono = czy_zatwierdzono_pozycje(pygame.event.get())
         zegar.tick(40)
-    return siatka.Polozenie(*poz_w)
+    return siatka.Polozenie(poz_w)
 
 
 def wyswietl_gracza(gracz, surface):
