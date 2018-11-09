@@ -29,14 +29,6 @@ class Polozenie(tuple):
     def przesun(self, translacja):
         return Polozenie(_dodaj_tuple(self, translacja.value))
 
-    def nie_wychodzi_poza(self, siatka):
-        """ sprawdza xzy położenie wychodzi poza planszę """
-        return (0 <= self[WIERSZ] < siatka.wierszy
-                and 0 <= self[KOLUMNA] < siatka.kolumn)
-
-    def jest_puste(self, siatka):
-        """ sprawdza czy polozenie na plansza jest puste """
-        return siatka[self] == symbol.Puste
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
@@ -56,6 +48,13 @@ class Siatka:
             bufor.extend(self.__repr_wiersz(num_wiersza))
             bufor.append("\n")
         return "".join(bufor)
+
+    def zawiera_polozenie(self, polozenie):
+        return (0 <= polozenie[WIERSZ] < self.wierszy
+                 and 0 <= polozenie[KOLUMNA] < self.kolumn)
+
+    def czy_polozenie_puste(self, polozenie):
+        return self[polozenie] == symbol.Puste
 
     __slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
     def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
@@ -156,7 +155,7 @@ class Siatka:
     def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
                                      translacja):
         licznik = 0
-        while polozenie.nie_wychodzi_poza(self):
+        while self.zawiera_polozenie(polozenie):
             if self[polozenie] == symbol_gracza:
                 licznik += 1
                 polozenie = polozenie.przesun(translacja)
