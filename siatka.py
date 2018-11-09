@@ -29,38 +29,6 @@ class Polozenie(tuple):
     def przesun(self, translacja):
         return Polozenie(_dodaj_tuple(self, translacja.value))
 
-    def w_lewo(self):
-        """zwraca nowe położenie przesunięte w lewo"""
-        return self.przesun(Translacja.LEWO)
-
-    def w_prawo(self):
-        """zwraca nowe położenie przesunięte w prawo"""
-        return self.przesun(Translacja.PRAWO)
-
-    def w_gore(self):
-        """zwraca nowe położenie przesunięte w górę"""
-        return self.przesun(Translacja.GORA)
-
-    def w_dol(self):
-        """zwraca nowe położenie przesunięte w dół"""
-        return self.przesun(Translacja.DOL)
-
-    def w_lewo_gore(self):
-        """zwraca nowe położenie przesunięte w lewo i w górę"""
-        return self.przesun(Translacja.LEWO_GORA)
-
-    def w_lewo_dol(self):
-        """zwraca nowe położenie przesunięte w lewo i  w dół"""
-        return self.przesun(Translacja.LEWO_DOL)
-
-    def w_prawo_gore(self):
-        """zwraca nowe położenie przesunięte w prawo i w górę"""
-        return self.przesun(Translacja.PRAWO_GORA)
-
-    def w_prawo_dol(self):
-        """zwraca nowe położenie przesunięte w prawo i w dół"""
-        return self.przesun(Translacja.PRAWO_DOL)
-
     def nie_wychodzi_poza(self, siatka):
         """ sprawdza xzy położenie wychodzi poza planszę """
         return (0 <= self[WIERSZ] < siatka.wierszy
@@ -154,15 +122,16 @@ class Siatka:
                                                      polozenie,
                                                      kierunki[0])
         #kierunek2
-        polozenie = (Siatka.__kierunki[kierunki[1]])(polozenie)
+        polozenie = polozenie.przesun(kierunki[1])
         licznik2 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                      polozenie,
                                                      kierunki[1])
         return (licznik1 + licznik2) >= WYGRYWAJACYCH
-    __strony = (('w_prawo', 'w_lewo'), #poziom
-                ('w_dol', 'w_gore'), #pion
-                ('w_prawo_dol', 'w_lewo_gore'), #ukos_lewy
-                ('w_lewo_dol', 'w_prawo_gore') #ukos_prawy
+
+    __strony = ((Translacja.PRAWO, Translacja.LEWO), #poziom
+                (Translacja.DOL, Translacja.GORA), #pion
+                (Translacja.PRAWO_DOL, Translacja.LEWO_GORA), #ukos_lewy
+                (Translacja.LEWO_DOL, Translacja.PRAWO_GORA) #ukos_prawy
                )
 
     def ma_uklad_wygrywajacy(self, polozenie):
@@ -184,23 +153,13 @@ class Siatka:
             if not self.__zajeta(ruch):
                 yield ruch
 
-    __kierunki = {'w_lewo': Polozenie.w_lewo,
-                  'w_prawo': Polozenie.w_prawo,
-                  'w_dol' : Polozenie.w_dol,
-                  'w_gore': Polozenie.w_gore,
-                  'w_prawo_dol': Polozenie.w_prawo_dol,
-                  'w_lewo_gore': Polozenie.w_lewo_gore,
-                  'w_prawo_gore': Polozenie.w_prawo_gore,
-                  'w_lewo_dol': Polozenie.w_lewo_dol,}
-
     def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
-                                     kierunek):
+                                     translacja):
         licznik = 0
-        idz_w_kierunku = Siatka.__kierunki[kierunek]
         while polozenie.nie_wychodzi_poza(self):
             if self[polozenie] == symbol_gracza:
                 licznik += 1
-                polozenie = idz_w_kierunku(polozenie)
+                polozenie = polozenie.przesun(translacja)
             else:
                 break
         return licznik
