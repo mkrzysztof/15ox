@@ -58,7 +58,7 @@ class Polozenie(object):
 
     def jest_puste(self, siatka):
         """ sprawdza czy polozenie na plansza jest puste """
-        return siatka.odczyt_polozenie(self) == symbol.Puste
+        return siatka[self] == symbol.Puste
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
@@ -69,7 +69,7 @@ class Siatka:
 
 
     def __repr_wiersz(self, num_wiersz):
-        return [self.odczyt_polozenie(Polozenie(num_wiersz, num_kol)).repr
+        return [self[Polozenie(num_wiersz, num_kol)].repr
                 for num_kol in range(self.kolumn)]
 
     def __repr__(self):
@@ -108,8 +108,7 @@ class Siatka:
             wyjscie.pola[numer] = wiersz.copy()
         return wyjscie
 
-    def odczyt_polozenie(self, polozenie):
-        """odczytuje symbol z położenia"""
+    def __getitem__(self, polozenie):
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
 
     def zapis_polozenie(self, polozenie, symbol_gracza):
@@ -117,7 +116,7 @@ class Siatka:
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
 
     def __zajeta(self, polozenie):
-        odczytany_symbol = self.odczyt_polozenie(polozenie)
+        odczytany_symbol = self[polozenie]
         return odczytany_symbol != symbol.Puste
 
     @staticmethod
@@ -140,7 +139,7 @@ class Siatka:
 
     def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
                                             kierunki):
-        symbol_sprawdzany = self.odczyt_polozenie(polozenie)
+        symbol_sprawdzany = self[polozenie]
         #kierunek1
         licznik1 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                      polozenie,
@@ -190,7 +189,7 @@ class Siatka:
         licznik = 0
         idz_w_kierunku = Siatka.__kierunki[kierunek]
         while polozenie.nie_wychodzi_poza(self):
-            if self.odczyt_polozenie(polozenie) == symbol_gracza:
+            if self[polozenie] == symbol_gracza:
                 licznik += 1
                 polozenie = idz_w_kierunku(polozenie)
             else:
