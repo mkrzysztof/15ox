@@ -1,4 +1,5 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
+import enum
 import itertools
 import symbol
 
@@ -7,49 +8,81 @@ WIERSZ = 0
 KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
-class Polozenie(object):
-    """reprezentuje położenie (wiersz, kolumna) """
-    def __init__(self, wiersz, kolumna):
-        self.poz = (wiersz, kolumna)
+def _dodaj_tuple(t1, t2):
+    return (t1[0] + t2[0], t1[1] + t2[1])
+
+class Translacja(enum.Enum):
+    """określa przesunięcia w 8-miu możliwych kierunkach"""
+    LEWO = (0, -1)
+    PRAWO = (0, 1)
+    GORA = (-1, 0)
+    DOL = (1, 0)
+    LEWO_GORA = _dodaj_tuple(LEWO, GORA)
+    LEWO_DOL = _dodaj_tuple(LEWO, DOL)
+    PRAWO_GORA = _dodaj_tuple(PRAWO, GORA)
+    PRAWO_DOL = _dodaj_tuple(PRAWO, DOL)
+
+
+class Polozenie:
+    """reprezentuje położenie"""
+
+    def __init__(self, *args):
+        if len(args) == 1:
+            poz = tuple(args[0])
+        else:
+            poz = tuple(args)
+        self.poz = poz
+
 
     def __str__(self):
         return str(self.poz)
 
+    def __getitem__(self, klucz):
+        return self.poz[klucz]
+
+    def __add__(self, translacja):
+        poz = self.poz
+        return Polozenie(_dodaj_tuple(poz, translacja.value))
+
     def w_lewo(self):
         """zwraca nowe położenie przesunięte w lewo"""
-        return Polozenie(self.poz[WIERSZ], self.poz[KOLUMNA] - 1)
+        return self + Translacja.LEWO
+        # return Polozenie(self[WIERSZ], self[KOLUMNA] - 1)
 
     def w_prawo(self):
         """zwraca nowe położenie przesunięte w prawo"""
-        return Polozenie(self.poz[WIERSZ], self.poz[KOLUMNA] + 1)
+        return self + Translacja.PRAWO
+        # return Polozenie(self[WIERSZ], self[KOLUMNA] + 1)
 
     def w_gore(self):
         """zwraca nowe położenie przesunięte w górę"""
-        return Polozenie(self.poz[WIERSZ] - 1, self.poz[KOLUMNA])
-
+        return self + Translacja.GORA
+        #return Polozenie(self[WIERSZ] - 1, self[KOLUMNA])
 
     def w_dol(self):
         """zwraca nowe położenie przesunięte w dół"""
-        return Polozenie(self.poz[WIERSZ] + 1, self.poz[KOLUMNA])
+        return self + Translacja.DOL
+        # return Polozenie(self[WIERSZ] + 1, self[KOLUMNA])
 
     def w_lewo_gore(self):
         """zwraca nowe położenie przesunięte w lewo i w górę"""
-        return self.w_lewo().w_gore()
+        return self + Translacja.LEWO_GORA
+        # return self.w_lewo().w_gore()
 
     def w_lewo_dol(self):
         """zwraca nowe położenie przesunięte w lewo i  w dół"""
-        return self.w_lewo().w_dol()
+        return self + Translacja.LEWO_DOL
+        # return self.w_lewo().w_dol()
 
     def w_prawo_gore(self):
         """zwraca nowe położenie przesunięte w prawo i w górę"""
-        return self.w_prawo().w_gore()
+        return self + Translacja.PRAWO_GORA
+        # return self.w_prawo().w_gore()
 
     def w_prawo_dol(self):
         """zwraca nowe położenie przesunięte w prawo i w dół"""
-        return self.w_prawo().w_dol()
-
-    def __getitem__(self, key):
-        return self.poz[key]
+        return self + Translacja.PRAWO_DOL
+        #return self.w_prawo().w_dol()
 
     def nie_wychodzi_poza(self, siatka):
         """ sprawdza xzy położenie wychodzi poza planszę """
