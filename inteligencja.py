@@ -8,7 +8,7 @@ def dodaj_ruch_na_siatce(wierzcholek, siatka, ruch, gracz):
     siatce nim etykietowany zwraca ten wierzcholek dla gracza"""
     nastepna_siatka = siatka.copy()
     przeciwnik = gracz.przeciwnik
-    nastepna_siatka.zapis_polozenie(ruch, przeciwnik.symbol)
+    nastepna_siatka[ruch] = przeciwnik.symbol
     pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, przeciwnik)
     wierzcholek.dodaj(ruch, pod_wierzcholek)
     return pod_wierzcholek

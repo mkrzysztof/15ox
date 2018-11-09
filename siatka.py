@@ -111,8 +111,7 @@ class Siatka:
     def __getitem__(self, polozenie):
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
 
-    def zapis_polozenie(self, polozenie, symbol_gracza):
-        """stawia symbol na położenie"""
+    def __setitem__(self, polozenie, symbol_gracza):
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
 
     def __zajeta(self, polozenie):
