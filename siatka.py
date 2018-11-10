@@ -9,7 +9,7 @@ KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
 def _dodaj_tuple(t1, t2):
-    return (t1[0] + t2[0], t1[1] + t2[1])
+    return (t1[WIERSZ] + t2[WIERSZ], t1[KOLUMNA] + t2[KOLUMNA])
 
 class Translacja(enum.Enum):
     """określa przesunięcia w 8-miu możliwych kierunkach"""
@@ -32,11 +32,14 @@ class Polozenie(tuple):
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
+    wszystkie = None
     def __init__(self, wierszy=15, kolumn=15):
         self.pola = [[symbol.Puste] * kolumn for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
-
+        if self.__class__.wszystkie is None:
+            self.__class__.wszystkie = list(
+                itertools.product(range(self.wierszy), range(self.kolumn)))
 
     def __repr_wiersz(self, num_wiersz):
         return [self[Polozenie((num_wiersz, num_kol))].repr
@@ -56,33 +59,11 @@ class Siatka:
     def czy_polozenie_puste(self, polozenie):
         return self[polozenie] == symbol.Puste
 
-    __slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
-    def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
-        bufor = []
-        for sym in linia:
-            bufor.append(Siatka.__slownik[sym])
-        self.pola[numer_wiersza] = bufor
-
-    def wypelnij_siatke(self, wzor):
-        """ wypełnij siatkę podanym wzorem:
-        [
-         'xo.xo.',
-         'o...x.',
-            .
-            .
-         'xxxxo.',
-        ]
-        gdzie kropka oznacza puste miejsce, wzór powinien być tak dobrany
-        by pasował do rozmiarów siatki
-        """
-        for numer, linia in enumerate(wzor):
-            self._wczytaj_linie_na_wiersz(linia, numer)
-
     def copy(self):
         """kopia ale tylko pola pola"""
         wyjscie = Siatka(self.wierszy, self.kolumn)
         for numer, wiersz in enumerate(self.pola):
-            wyjscie.pola[numer] = wiersz.copy()
+            wyjscie.pola[numer] = wiersz[:]
         return wyjscie
 
     def __getitem__(self, polozenie):
@@ -90,10 +71,6 @@ class Siatka:
 
     def __setitem__(self, polozenie, symbol_gracza):
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
-
-    def __zajeta(self, polozenie):
-        odczytany_symbol = self[polozenie]
-        return odczytany_symbol != symbol.Puste
 
     @staticmethod
     def _wiersz_jest_zapelniony(wiersz):
@@ -117,15 +94,15 @@ class Siatka:
                                             kierunki):
         symbol_sprawdzany = self[polozenie]
         #kierunek1
-        licznik1 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
+        licznik = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                      polozenie,
                                                      kierunki[0])
         #kierunek2
         polozenie = polozenie.przesun(kierunki[1])
-        licznik2 = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
+        licznik += self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                      polozenie,
                                                      kierunki[1])
-        return (licznik1 + licznik2) >= WYGRYWAJACYCH
+        return licznik >= WYGRYWAJACYCH
 
     __strony = ((Translacja.PRAWO, Translacja.LEWO), #poziom
                 (Translacja.DOL, Translacja.GORA), #pion
@@ -145,20 +122,43 @@ class Siatka:
         return wyj
 
     def wolne_pola(self):
-        """ zwraca generator wolnych pól (Polozenie) siatki """
-        wszystkie = itertools.product(range(self.wierszy), range(self.kolumn))
-        for para in wszystkie:
-            ruch = Polozenie(para)
-            if not self.__zajeta(ruch):
-                yield ruch
+        """ zwraca generator wolnych pól (Polozenie) siatki """        
+        # for para in wszystkie:
+        #     ruch = Polozenie(para)
+        #     if self.czy_polozenie_puste(ruch):
+        #         yield ruch
+        return filter(self.czy_polozenie_puste,
+                      map(Polozenie, self.__class__.wszystkie))
 
     def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
                                      translacja):
         licznik = 0
         while self.zawiera_polozenie(polozenie):
-            if self[polozenie] == symbol_gracza:
-                licznik += 1
-                polozenie = polozenie.przesun(translacja)
-            else:
+            if self[polozenie] != symbol_gracza:
                 break
+            licznik += 1
+            polozenie = polozenie.przesun(translacja)
         return licznik
+
+    __slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
+    def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
+        bufor = []
+        slownik = Siatka.__slownik
+        for sym in linia:
+            bufor.append(slownik[sym])
+        self.pola[numer_wiersza] = bufor
+
+    def wypelnij_siatke(self, wzor):
+        """ wypełnij siatkę podanym wzorem:
+        [
+         'xo.xo.',
+         'o...x.',
+            .
+            .
+         'xxxxo.',
+        ]
+        gdzie kropka oznacza puste miejsce, wzór powinien być tak dobrany
+        by pasował do rozmiarów siatki
+        """
+        for numer, linia in enumerate(wzor):
+            self._wczytaj_linie_na_wiersz(linia, numer)
