@@ -32,14 +32,11 @@ class Polozenie(tuple):
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
-    wszystkie = None
     def __init__(self, wierszy=15, kolumn=15):
         self.pola = [[symbol.Puste] * kolumn for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
-        if self.__class__.wszystkie is None:
-            self.__class__.wszystkie = list(
-                itertools.product(range(self.wierszy), range(self.kolumn)))
+        self._wolne_pola = None
 
     def __repr_wiersz(self, num_wiersz):
         return [self[Polozenie((num_wiersz, num_kol))].repr
@@ -64,13 +61,24 @@ class Siatka:
         wyjscie = Siatka(self.wierszy, self.kolumn)
         for numer, wiersz in enumerate(self.pola):
             wyjscie.pola[numer] = wiersz[:]
+        self._inicjuj_wolne_pola()
+        wyjscie._wolne_pola = self._wolne_pola.copy()
         return wyjscie
 
+    def _inicjuj_wolne_pola(self):
+        if self._wolne_pola is None:
+            pary = itertools.product(range(self.wierszy),
+                                     range(self.kolumn))
+            self._wolne_pola = set(Polozenie(tpl) for tpl in pary)
+    
     def __getitem__(self, polozenie):
+        self._inicjuj_wolne_pola()
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
 
     def __setitem__(self, polozenie, symbol_gracza):
+        self._inicjuj_wolne_pola()
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
+        self._wolne_pola.discard(polozenie)
 
     @staticmethod
     def _wiersz_jest_zapelniony(wiersz):
@@ -83,12 +91,7 @@ class Siatka:
 
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
-        zap = True
-        for wiersz in self.pola:
-            zap = zap and (Siatka._wiersz_jest_zapelniony(wiersz))
-            if not zap:
-                break
-        return zap
+        return len(self._wolne_pola) == 0
 
     def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
                                             kierunki):
@@ -122,13 +125,8 @@ class Siatka:
         return wyj
 
     def wolne_pola(self):
-        """ zwraca generator wolnych pól (Polozenie) siatki """        
-        # for para in wszystkie:
-        #     ruch = Polozenie(para)
-        #     if self.czy_polozenie_puste(ruch):
-        #         yield ruch
-        return filter(self.czy_polozenie_puste,
-                      map(Polozenie, self.__class__.wszystkie))
+        self._inicjuj_wolne_pola()
+        return self._wolne_pola
 
     def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
                                      translacja):
