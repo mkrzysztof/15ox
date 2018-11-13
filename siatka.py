@@ -8,8 +8,8 @@ WIERSZ = 0
 KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
-def _dodaj_tuple(t1, t2):
-    return (t1[WIERSZ] + t2[WIERSZ], t1[KOLUMNA] + t2[KOLUMNA])
+def _dodaj_tuple(tuple1, tuple2):
+    return (tuple1[WIERSZ] + tuple2[WIERSZ], tuple1[KOLUMNA] + tuple2[KOLUMNA])
 
 class Translacja(enum.Enum):
     """określa przesunięcia w 8-miu możliwych kierunkach"""
@@ -51,7 +51,7 @@ class Siatka:
 
     def zawiera_polozenie(self, polozenie):
         return (0 <= polozenie[WIERSZ] < self.wierszy
-                 and 0 <= polozenie[KOLUMNA] < self.kolumn)
+                and 0 <= polozenie[KOLUMNA] < self.kolumn)
 
     def czy_polozenie_puste(self, polozenie):
         return self[polozenie] == symbol.Puste
@@ -70,7 +70,7 @@ class Siatka:
             pary = itertools.product(range(self.wierszy),
                                      range(self.kolumn))
             self._wolne_pola = set(Polozenie(tpl) for tpl in pary)
-    
+
     def __getitem__(self, polozenie):
         self._inicjuj_wolne_pola()
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
@@ -79,15 +79,6 @@ class Siatka:
         self._inicjuj_wolne_pola()
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
         self._wolne_pola.discard(polozenie)
-
-    @staticmethod
-    def _wiersz_jest_zapelniony(wiersz):
-        zap = True
-        for badany_symbol in wiersz:
-            zap = zap and (badany_symbol != symbol.Puste)
-            if not zap:
-                break
-        return zap
 
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
@@ -98,8 +89,8 @@ class Siatka:
         symbol_sprawdzany = self[polozenie]
         #kierunek1
         licznik = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
-                                                     polozenie,
-                                                     kierunki[0])
+                                                    polozenie,
+                                                    kierunki[0])
         #kierunek2
         polozenie = polozenie.przesun(kierunki[1])
         licznik += self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
