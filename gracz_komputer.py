@@ -1,7 +1,6 @@
 """ moduł gracza komputerowego """
 import gracz
 import inteligencja
-import copy
 from monitoring import pokaz_wywolanie
 
 import time
@@ -12,7 +11,7 @@ class GraczKomputer(gracz.Gracz):
                 super().__init__(symbol, nazwa="GRACZ-KOMPUTER")
     @pokaz_wywolanie
     def wyszukaj_wolne_pole(self, siatka):
-        siatka_kopia = copy.deepcopy(siatka)
+        siatka_kopia = siatka.copy()
         self.mnoznik = 1
         self.przeciwnik.mnoznik = - 1
         czas = time.time()

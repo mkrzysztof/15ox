@@ -71,6 +71,10 @@ class Siatka:
                                      range(self.kolumn))
             self._wolne_pola = set(Polozenie(tpl) for tpl in pary)
 
+    def kasuj_wolne_pola(self):
+        """ ustawia zbiór wolnych pól na pusty """
+        self._wolne_pola = set()
+
     def __getitem__(self, polozenie):
         self._inicjuj_wolne_pola()
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]

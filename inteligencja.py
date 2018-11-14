@@ -1,45 +1,53 @@
 import drzewo
-import siatka
-import gracz
 
 
-def dodaj_ruch_na_siatce(wierzcholek, siatka, ruch, gracz):
-    """ dodaje do wierczhołka element odpowiadający ruchowi na 
+def dodaj_ruch_na_siatce(wierzcholek, ruch):
+    """ dodaje do wierczhołka element odpowiadający ruchowi na
     siatce nim etykietowany zwraca ten wierzcholek dla gracza"""
-    nastepna_siatka = siatka.copy()
-    przeciwnik = gracz.przeciwnik
+    nastepna_siatka = wierzcholek.siatka.copy()
+    aktywny_gracz = wierzcholek.gracz
+    przeciwnik = aktywny_gracz.przeciwnik
     nastepna_siatka[ruch] = przeciwnik.symbol
     pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, przeciwnik)
     wierzcholek.dodaj(ruch, pod_wierzcholek)
     return pod_wierzcholek
 
+def dodaj_podwierzcholki(wierzcholek, stos):
+    """ na podstawie zbioru wolnych pól na siatce dodaje
+    do wierzcholka potomków reprezentujących następny ruch
+    następnie umieść je na stosie"""
+    wolne_pola = wierzcholek.siatka.wolne_pola()
+    for ruch in wolne_pola:
+        pod_wierzcholek = dodaj_ruch_na_siatce(wierzcholek, ruch)
+        element = (pod_wierzcholek, ruch)
+        stos.append(element)
+
+def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch):
+    """ wartościuje wierzcholek w przypadku powodzenia ustawia zbiór wolnych
+    pól siatki na puste, w pp wierzcholkowi nadawana jest wartość None"""
+    siatka = wierzcholek.siatka
+    aktywny_gracz = wierzcholek.gracz
+    if siatka.jest_zapelniona():
+        wierzcholek.wartosc = 0
+    elif ostatni_ruch is not None:
+        if siatka.ma_uklad_wygrywajacy(ostatni_ruch):
+            wierzcholek.wartosc = aktywny_gracz.mnoznik
+            siatka.kasuj_wolne_pola()
+        else:
+            wierzcholek.wartosc = None
+    else:
+        wierzcholek.wartosc = None
+
 def buduj_drzewo(stan_siatki, gracz_aktywny):
     przeciwnik = gracz_aktywny.przeciwnik
-    glebokosc = 0
     wierzch_wyj = drzewo.Wierzcholek(stan_siatki, przeciwnik)
     stos = []
-    element = (wierzch_wyj, None, glebokosc)
+    element = (wierzch_wyj, None)
     stos.append(element)
-    while len(stos) != 0:
-        wierzcholek, ruch, glebokosc = stos.pop()
-        glebokosc += 1
-        siatka = wierzcholek.siatka.copy()
-        gracz = wierzcholek.gracz
-        wolne_pola = []
-        if siatka.jest_zapelniona():
-            wierzcholek.wartosc = 0
-        elif ruch is not None:
-            if siatka.ma_uklad_wygrywajacy(ruch):
-                wierzcholek.wartosc = gracz.mnoznik
-            else:
-                wolne_pola = siatka.wolne_pola()
-        else:
-            wolne_pola = siatka.wolne_pola()
-        for ruch in wolne_pola:
-            pod_wierzcholek = dodaj_ruch_na_siatce(wierzcholek, siatka, ruch,
-                                                   gracz)
-            element = (pod_wierzcholek, ruch, glebokosc)
-            stos.append(element)
+    while stos:
+        wierzcholek, ruch = stos.pop()
+        wartosciuj_wierzcholek(wierzcholek, ruch)
+        dodaj_podwierzcholki(wierzcholek, stos)
         wierzcholek.siatka = None
     return wierzch_wyj
 
@@ -60,6 +68,6 @@ def min_max(wierzcholek, gracz_aktywny):
             dziecko = wierzcholek.odczytaj(ruch)
             dziecko.wartosc = min_max(dziecko, gracz_aktywny)[1]
             wartosci[ruch] = dziecko.wartosc
-        ruch, wartosc = fun_por(wartosci.items(), key = klucz)
+        ruch, wartosc = fun_por(wartosci.items(), key=klucz)
         wierzcholek.wartosc = wartosc
     return (ruch, wartosc)
