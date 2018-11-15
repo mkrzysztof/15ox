@@ -1,16 +1,19 @@
 import drzewo
 
 
+def stworz_wierzcholek_przeciwnika(wierzcholek, ruch):
+    """stwórz wierzcholek odpowiadający temu jak przeciwik wykona ruch"""
+    przeciwnik = wierzcholek.gracz.przeciwnik
+    nastepna_siatka = wierzcholek.siatka.copy()
+    nastepna_siatka[ruch] = przeciwnik.symbol
+    return drzewo.Wierzcholek(nastepna_siatka, przeciwnik)
+
 def dodaj_ruch_na_siatce(wierzcholek, ruch):
     """ dodaje do wierczhołka element odpowiadający ruchowi na
     siatce nim etykietowany zwraca ten wierzcholek dla gracza"""
-    nastepna_siatka = wierzcholek.siatka.copy()
-    aktywny_gracz = wierzcholek.gracz
-    przeciwnik = aktywny_gracz.przeciwnik
-    nastepna_siatka[ruch] = przeciwnik.symbol
-    pod_wierzcholek = drzewo.Wierzcholek(nastepna_siatka, przeciwnik)
-    wierzcholek.dodaj(ruch, pod_wierzcholek)
-    return pod_wierzcholek
+    wierzcholek_przeciwnika = stworz_wierzcholek_przeciwnika(wierzcholek, ruch)
+    wierzcholek[ruch] = wierzcholek_przeciwnika
+    return wierzcholek_przeciwnika
 
 def dodaj_podwierzcholki(wierzcholek, stos):
     """ na podstawie zbioru wolnych pól na siatce dodaje
@@ -65,7 +68,7 @@ def min_max(wierzcholek, gracz_aktywny):
     if wartosc is None:
         wartosci = {}
         for ruch in wierzcholek.keys():
-            dziecko = wierzcholek.odczytaj(ruch)
+            dziecko = wierzcholek[ruch]
             dziecko.wartosc = min_max(dziecko, gracz_aktywny)[1]
             wartosci[ruch] = dziecko.wartosc
         ruch, wartosc = fun_por(wartosci.items(), key=klucz)

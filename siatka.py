@@ -81,23 +81,20 @@ class Siatka:
 
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
-        return len(self._wolne_pola) == 0
+        return not self._wolne_pola
 
-    def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie,
-                                            kierunki):
+    def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie, kierunki):
         symbol_sprawdzany = self[polozenie]
-        #kierunek1
         licznik = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                     polozenie,
                                                     kierunki[0])
-        #kierunek2
         polozenie = polozenie.przesun(kierunki[1])
         licznik += self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
                                                      polozenie,
                                                      kierunki[1])
         return licznik >= WYGRYWAJACYCH
 
-    __strony = ((Translacja.PRAWO, Translacja.LEWO), #poziom
+    _strony = ((Translacja.PRAWO, Translacja.LEWO), #poziom
                 (Translacja.DOL, Translacja.GORA), #pion
                 (Translacja.PRAWO_DOL, Translacja.LEWO_GORA), #ukos_lewy
                 (Translacja.LEWO_DOL, Translacja.PRAWO_GORA) #ukos_prawy
@@ -108,7 +105,7 @@ class Siatka:
         w 4 kierunkach
         """
         wyj = False
-        for kierunek in Siatka.__strony:
+        for kierunek in self._strony:
             if self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie, kierunek):
                 wyj = True
                 break
@@ -128,12 +125,11 @@ class Siatka:
             polozenie = polozenie.przesun(translacja)
         return licznik
 
-    __slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
+    _slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
     def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
         bufor = []
-        slownik = Siatka.__slownik
         for sym in linia:
-            bufor.append(slownik[sym])
+            bufor.append(self._slownik[sym])
         self.pola[numer_wiersza] = bufor
 
     def wypelnij_siatke(self, wzor):
