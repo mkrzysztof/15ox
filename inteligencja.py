@@ -15,6 +15,20 @@ def dodaj_ruch_na_siatce(wierzcholek, ruch):
     wierzcholek[ruch] = wierzcholek_przeciwnika
     return wierzcholek_przeciwnika
 
+def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch):
+    """ wartościuje wierzcholek w przypadku powodzenia ustawia zbiór wolnych
+    pól siatki na puste, w pp wierzcholkowi nadawana jest wartość None"""
+    siatka = wierzcholek.siatka
+    aktywny_gracz = wierzcholek.gracz
+    if siatka.jest_zapelniona():
+        wierzcholek.wartosc = 0
+        return
+    if siatka.ma_uklad_wygrywajacy(ostatni_ruch):
+        wierzcholek.wartosc = aktywny_gracz.mnoznik
+        siatka.kasuj_wolne_pola()
+    else:
+        wierzcholek.wartosc = None
+
 def dodaj_podwierzcholki(wierzcholek, stos):
     """ na podstawie zbioru wolnych pól na siatce dodaje
     do wierzcholka potomków reprezentujących następny ruch
@@ -24,22 +38,6 @@ def dodaj_podwierzcholki(wierzcholek, stos):
         pod_wierzcholek = dodaj_ruch_na_siatce(wierzcholek, ruch)
         element = (pod_wierzcholek, ruch)
         stos.append(element)
-
-def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch):
-    """ wartościuje wierzcholek w przypadku powodzenia ustawia zbiór wolnych
-    pól siatki na puste, w pp wierzcholkowi nadawana jest wartość None"""
-    siatka = wierzcholek.siatka
-    aktywny_gracz = wierzcholek.gracz
-    if siatka.jest_zapelniona():
-        wierzcholek.wartosc = 0
-    elif ostatni_ruch is not None:
-        if siatka.ma_uklad_wygrywajacy(ostatni_ruch):
-            wierzcholek.wartosc = aktywny_gracz.mnoznik
-            siatka.kasuj_wolne_pola()
-        else:
-            wierzcholek.wartosc = None
-    else:
-        wierzcholek.wartosc = None
 
 def buduj_drzewo(stan_siatki, gracz_aktywny):
     przeciwnik = gracz_aktywny.przeciwnik
@@ -60,15 +58,10 @@ def klucz(x):
 def min_max(wierzcholek, gracz_aktywny):
     wartosc = wierzcholek.wartosc
     ruch = None
-    fun_por = None
-    if wierzcholek.gracz != gracz_aktywny:
-        fun_por = max
-    else:
-        fun_por = min
+    fun_por = max if (wierzcholek.gracz != gracz_aktywny) else min
     if wartosc is None:
         wartosci = {}
-        for ruch in wierzcholek.keys():
-            dziecko = wierzcholek[ruch]
+        for ruch, dziecko in wierzcholek.items():
             dziecko.wartosc = min_max(dziecko, gracz_aktywny)[1]
             wartosci[ruch] = dziecko.wartosc
         ruch, wartosc = fun_por(wartosci.items(), key=klucz)

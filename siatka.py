@@ -105,6 +105,8 @@ class Siatka:
         w 4 kierunkach
         """
         wyj = False
+        if polozenie is None:
+            return wyj
         for kierunek in self._strony:
             if self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie, kierunek):
                 wyj = True
