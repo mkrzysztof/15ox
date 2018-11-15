@@ -26,8 +26,6 @@ def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch):
     if siatka.ma_uklad_wygrywajacy(ostatni_ruch):
         wierzcholek.wartosc = aktywny_gracz.mnoznik
         siatka.kasuj_wolne_pola()
-    else:
-        wierzcholek.wartosc = None
 
 def dodaj_podwierzcholki(wierzcholek, stos):
     """ na podstawie zbioru wolnych pól na siatce dodaje
@@ -62,7 +60,7 @@ def min_max(wierzcholek, gracz_aktywny):
     if wartosc is None:
         wartosci = {}
         for ruch, dziecko in wierzcholek.items():
-            dziecko.wartosc = min_max(dziecko, gracz_aktywny)[1]
+            _, dziecko.wartosc = min_max(dziecko, gracz_aktywny)
             wartosci[ruch] = dziecko.wartosc
         ruch, wartosc = fun_por(wartosci.items(), key=klucz)
         wierzcholek.wartosc = wartosc

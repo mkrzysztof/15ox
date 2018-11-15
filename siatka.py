@@ -83,22 +83,28 @@ class Siatka:
         """sprawdza czy plansza jest całkowicie wypełniona"""
         return not self._wolne_pola
 
-    def __ma_uklad_wygrywajacy_w_kierunkach(self, polozenie, kierunki):
+    def policz_symbol(self, symbol_gracza, polozenie, translacja):
+        licznik = 0
+        while self.zawiera_polozenie(polozenie):
+            if self[polozenie] != symbol_gracza:
+                break
+            licznik += 1
+            polozenie = polozenie.przesun(translacja)
+        return licznik
+
+    def wygrywa_strona(self, polozenie, strona):
         symbol_sprawdzany = self[polozenie]
-        licznik = self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
-                                                    polozenie,
-                                                    kierunki[0])
-        polozenie = polozenie.przesun(kierunki[1])
-        licznik += self.__zliczaj_symbole_w_kierunku(symbol_sprawdzany,
-                                                     polozenie,
-                                                     kierunki[1])
+        translacja1, translacja2 = strona
+        licznik = self.policz_symbol(symbol_sprawdzany, polozenie, translacja1)
+        polozenie = polozenie.przesun(translacja2)
+        licznik += self.policz_symbol(symbol_sprawdzany, polozenie,
+                                      translacja2)
         return licznik >= WYGRYWAJACYCH
 
     _strony = ((Translacja.PRAWO, Translacja.LEWO), #poziom
-                (Translacja.DOL, Translacja.GORA), #pion
-                (Translacja.PRAWO_DOL, Translacja.LEWO_GORA), #ukos_lewy
-                (Translacja.LEWO_DOL, Translacja.PRAWO_GORA) #ukos_prawy
-               )
+               (Translacja.DOL, Translacja.GORA), #pion
+               (Translacja.PRAWO_DOL, Translacja.LEWO_GORA), #ukos_lewy
+               (Translacja.LEWO_DOL, Translacja.PRAWO_GORA),) #ukos_prawy
 
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
@@ -107,8 +113,8 @@ class Siatka:
         wyj = False
         if polozenie is None:
             return wyj
-        for kierunek in self._strony:
-            if self.__ma_uklad_wygrywajacy_w_kierunkach(polozenie, kierunek):
+        for strona in self._strony:
+            if self.wygrywa_strona(polozenie, strona):
                 wyj = True
                 break
         return wyj
@@ -116,16 +122,6 @@ class Siatka:
     def wolne_pola(self):
         self.inicjuj_wolne_pola()
         return self._wolne_pola
-
-    def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
-                                     translacja):
-        licznik = 0
-        while self.zawiera_polozenie(polozenie):
-            if self[polozenie] != symbol_gracza:
-                break
-            licznik += 1
-            polozenie = polozenie.przesun(translacja)
-        return licznik
 
     _slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
     def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
