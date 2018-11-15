@@ -1,6 +1,5 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
 import enum
-import itertools
 import symbol
 
 #stałe
@@ -53,34 +52,30 @@ class Siatka:
         return (0 <= polozenie[WIERSZ] < self.wierszy
                 and 0 <= polozenie[KOLUMNA] < self.kolumn)
 
-    def czy_polozenie_puste(self, polozenie):
-        return self[polozenie] == symbol.Puste
-
     def copy(self):
         """kopia ale tylko pola pola"""
         wyjscie = Siatka(self.wierszy, self.kolumn)
         for numer, wiersz in enumerate(self.pola):
             wyjscie.pola[numer] = wiersz[:]
-        self._inicjuj_wolne_pola()
+        self.inicjuj_wolne_pola()
         wyjscie._wolne_pola = self._wolne_pola.copy()
         return wyjscie
 
-    def _inicjuj_wolne_pola(self):
+    def inicjuj_wolne_pola(self):
         if self._wolne_pola is None:
-            pary = itertools.product(range(self.wierszy),
-                                     range(self.kolumn))
-            self._wolne_pola = set(Polozenie(tpl) for tpl in pary)
+            self._wolne_pola = set(Polozenie((x, y))
+                                   for x in range(self.wierszy)
+                                   for y in range(self.kolumn))
 
     def kasuj_wolne_pola(self):
         """ ustawia zbiór wolnych pól na pusty """
         self._wolne_pola = set()
 
     def __getitem__(self, polozenie):
-        self._inicjuj_wolne_pola()
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
 
     def __setitem__(self, polozenie, symbol_gracza):
-        self._inicjuj_wolne_pola()
+        self.inicjuj_wolne_pola()
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
         self._wolne_pola.discard(polozenie)
 
@@ -120,7 +115,7 @@ class Siatka:
         return wyj
 
     def wolne_pola(self):
-        self._inicjuj_wolne_pola()
+        self.inicjuj_wolne_pola()
         return self._wolne_pola
 
     def __zliczaj_symbole_w_kierunku(self, symbol_gracza, polozenie,
