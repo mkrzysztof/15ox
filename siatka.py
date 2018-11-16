@@ -1,5 +1,5 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
-import enum
+import copy
 import symbol
 
 #stałe
@@ -7,26 +7,25 @@ WIERSZ = 0
 KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
+LEWO = (0, -1)
+PRAWO = (0, 1)
+GORA = (-1, 0)
+DOL = (1, 0)
+
 def _dodaj_tuple(tuple1, tuple2):
     return (tuple1[WIERSZ] + tuple2[WIERSZ], tuple1[KOLUMNA] + tuple2[KOLUMNA])
 
-class Translacja(enum.Enum):
-    """określa przesunięcia w 8-miu możliwych kierunkach"""
-    LEWO = (0, -1)
-    PRAWO = (0, 1)
-    GORA = (-1, 0)
-    DOL = (1, 0)
-    LEWO_GORA = _dodaj_tuple(LEWO, GORA)
-    LEWO_DOL = _dodaj_tuple(LEWO, DOL)
-    PRAWO_GORA = _dodaj_tuple(PRAWO, GORA)
-    PRAWO_DOL = _dodaj_tuple(PRAWO, DOL)
+LEWO_GORA = _dodaj_tuple(LEWO, GORA)
+LEWO_DOL = _dodaj_tuple(LEWO, DOL)
+PRAWO_GORA = _dodaj_tuple(PRAWO, GORA)
+PRAWO_DOL = _dodaj_tuple(PRAWO, DOL)
 
 
 class Polozenie(tuple):
     """reprezentuje położenie"""
 
     def przesun(self, translacja):
-        return Polozenie(_dodaj_tuple(self, translacja.value))
+        return Polozenie(_dodaj_tuple(self, translacja))
 
 
 class Siatka:
@@ -53,7 +52,6 @@ class Siatka:
                 and 0 <= polozenie[KOLUMNA] < self.kolumn)
 
     def copy(self):
-        """kopia ale tylko pola pola"""
         wyjscie = Siatka(self.wierszy, self.kolumn)
         for numer, wiersz in enumerate(self.pola):
             wyjscie.pola[numer] = wiersz[:]
@@ -101,10 +99,10 @@ class Siatka:
                                       translacja2)
         return licznik >= WYGRYWAJACYCH
 
-    _strony = ((Translacja.PRAWO, Translacja.LEWO), #poziom
-               (Translacja.DOL, Translacja.GORA), #pion
-               (Translacja.PRAWO_DOL, Translacja.LEWO_GORA), #ukos_lewy
-               (Translacja.LEWO_DOL, Translacja.PRAWO_GORA),) #ukos_prawy
+    _strony = ((PRAWO, LEWO), #poziom
+               (DOL, GORA), #pion
+               (PRAWO_DOL, LEWO_GORA), #ukos_lewy
+               (LEWO_DOL, PRAWO_GORA),) #ukos_prawy
 
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
