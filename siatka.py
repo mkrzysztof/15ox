@@ -1,6 +1,4 @@
 """ Moduł zawiera fefinicję klas Polozenie i Siatka"""
-import copy
-import symbol
 
 #stałe
 WIERSZ = 0
@@ -31,7 +29,7 @@ class Polozenie(tuple):
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
     def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[symbol.Puste] * kolumn for y in range(wierszy)]
+        self.pola = [[None] * kolumn for y in range(wierszy)]
         self.wierszy = wierszy
         self.kolumn = kolumn
         self._wolne_pola = None
@@ -120,25 +118,3 @@ class Siatka:
     def wolne_pola(self):
         self.inicjuj_wolne_pola()
         return self._wolne_pola
-
-    _slownik = {'x': symbol.Krzyzyk, 'o': symbol.Kolko, '.': symbol.Puste}
-    def _wczytaj_linie_na_wiersz(self, linia, numer_wiersza):
-        bufor = []
-        for sym in linia:
-            bufor.append(self._slownik[sym])
-        self.pola[numer_wiersza] = bufor
-
-    def wypelnij_siatke(self, wzor):
-        """ wypełnij siatkę podanym wzorem:
-        [
-         'xo.xo.',
-         'o...x.',
-            .
-            .
-         'xxxxo.',
-        ]
-        gdzie kropka oznacza puste miejsce, wzór powinien być tak dobrany
-        by pasował do rozmiarów siatki
-        """
-        for numer, linia in enumerate(wzor):
-            self._wczytaj_linie_na_wiersz(linia, numer)
