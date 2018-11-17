@@ -35,8 +35,14 @@ class Siatka:
         self._wolne_pola = None
 
     def __repr_wiersz(self, num_wiersz):
-        return [self[Polozenie((num_wiersz, num_kol))].repr
-                for num_kol in range(self.kolumn)]
+        wyj = []
+        for num_kol in range(self.kolumn):
+            symbol = self[Polozenie((num_wiersz, num_kol))]
+            if symbol:
+                wyj.append(symbol.repr)
+            else:
+                wyj.append(".")
+        return wyj
 
     def __repr__(self):
         bufor = []

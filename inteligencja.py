@@ -27,15 +27,33 @@ def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch):
         wierzcholek.wartosc = aktywny_gracz.mnoznik
         siatka.kasuj_wolne_pola()
 
-def dodaj_podwierzcholki(wierzcholek, stos):
+def dodaj_podwierzcholki(wierzcholek, stos, stopien=0):
     """ na podstawie zbioru wolnych pól na siatce dodaje
     do wierzcholka potomków reprezentujących następny ruch
     następnie umieść je na stosie"""
     wolne_pola = wierzcholek.siatka.wolne_pola()
     for ruch in wolne_pola:
         pod_wierzcholek = dodaj_ruch_na_siatce(wierzcholek, ruch)
-        element = (pod_wierzcholek, ruch)
+        element = (pod_wierzcholek, ruch, stopien)
         stos.append(element)
+
+def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, stopien):
+    """buduj drzewo o głębokości stopien"""
+    przeciwnik = gracz_aktywny.przeciwnik
+    wierzch_wyj = drzewo.Wierzcholek(stan_siatki, przeciwnik)
+    stos = []
+    licznik_stopnia = 0
+    element = (wierzch_wyj, None, licznik_stopnia)
+    stos.append(element)
+    while stos:
+        wierzcholek, ruch, licznik_stopnia = stos.pop()
+        if licznik_stopnia < stopien:
+            wartosciuj_wierzcholek(wierzcholek, ruch)
+            if licznik_stopnia == stopien - 1 and wierzcholek.wartosc is None:
+                wierzcholek.wartosc = 0
+            dodaj_podwierzcholki(wierzcholek, stos, licznik_stopnia + 1)
+            wierzcholek.siatka = None
+    return wierzch_wyj
 
 def buduj_drzewo(stan_siatki, gracz_aktywny):
     przeciwnik = gracz_aktywny.przeciwnik
