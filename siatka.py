@@ -94,19 +94,25 @@ class Siatka:
             polozenie = polozenie.przesun(translacja)
         return licznik
 
-    def wygrywa_strona(self, polozenie, strona):
+    _strony = {"poziom": (PRAWO, LEWO),
+               "pion": (DOL, GORA),
+               "ukos_lewy": (PRAWO_DOL, LEWO_GORA),
+               "ukos_prawy": (LEWO_DOL, PRAWO_GORA),}
+
+    def policz_symbol_strona(self, polozenie, strona):
+        """ policz ciągłe wystąpienia symbolu wokół położenia dla
+        strony """
+        licznik = 0
         symbol_sprawdzany = self[polozenie]
-        translacja1, translacja2 = strona
+        translacja1, translacja2 = self._strony[strona]
         licznik = self.policz_symbol(symbol_sprawdzany, polozenie, translacja1)
         polozenie = polozenie.przesun(translacja2)
         licznik += self.policz_symbol(symbol_sprawdzany, polozenie,
                                       translacja2)
-        return licznik >= WYGRYWAJACYCH
+        return licznik
 
-    _strony = ((PRAWO, LEWO), #poziom
-               (DOL, GORA), #pion
-               (PRAWO_DOL, LEWO_GORA), #ukos_lewy
-               (LEWO_DOL, PRAWO_GORA),) #ukos_prawy
+    def wygrywa_strona(self, polozenie, strona):
+        return self.policz_symbol_strona(polozenie, strona) >= WYGRYWAJACYCH
 
     def ma_uklad_wygrywajacy(self, polozenie):
         """szukaj układu wygrywającego wok1ół pozycji pozycja,
