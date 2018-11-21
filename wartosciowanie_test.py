@@ -20,9 +20,6 @@ def stworz_siatke(wierszy, kolumn, wypelnienie):
 
 class TestWartosciowanie(unittest.TestCase):
 
-    
-        
-    
     def test_siatka1(self):
         """ siatka
         xxx
@@ -47,6 +44,28 @@ class TestWartosciowanie(unittest.TestCase):
     def siatka3(self):
         pass
 
+class TestMaxStrony(unittest.TestCase):
+    wypelnienie1 = [
+        [(0, 5), "x"],
+        [(1, 2), "x"], [(1, 4), "x"],
+        [(2, 2), "x"], [(2, 3), "x"], [(2, 4), "o"],
+        [(3, 1), "x"], [(3, 2), "x"], [(3, 3), "x"], [(3, 4), "x"],
+        [(3, 5), "x"],
+        [(4, 1), "x"], [(4, 2), "x"],
+        [(5, 0), "x"],
+    ]
+
+    def test1(self):
+        siatka1 = stworz_siatke(10, 10, self.wypelnienie1)
+        gracz = unittest.mock.Mock()
+        gracz.mnoznik = 1
+        testowany = wartosciowanie.max_strony(siatka1, gracz,
+                                              siatka.Polozenie((3,2)))
+        self.assertEqual(6, testowany)
+        testowany = wartosciowanie.max_strony(siatka1, gracz,
+                                              siatka.Polozenie((2,2)))
+        self.assertEqual(4, testowany)
+        
     
 
 

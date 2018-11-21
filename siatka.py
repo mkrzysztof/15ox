@@ -5,6 +5,11 @@ WIERSZ = 0
 KOLUMNA = 1
 WYGRYWAJACYCH = 3
 
+POZIOM = "poziom"
+PION = "pion"
+UKOS_LEWY = "ukos_lewy"
+UKOS_PRAWY = "ukos_prawy"
+
 LEWO = (0, -1)
 PRAWO = (0, 1)
 GORA = (-1, 0)

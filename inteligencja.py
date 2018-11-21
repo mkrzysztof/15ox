@@ -1,5 +1,5 @@
 import drzewo
-
+import wartosciowanie
 
 def stworz_wierzcholek_przeciwnika(wierzcholek, ruch):
     """stwórz wierzcholek odpowiadający temu jak przeciwik wykona ruch"""
@@ -15,17 +15,12 @@ def dodaj_ruch_na_siatce(wierzcholek, ruch):
     wierzcholek[ruch] = wierzcholek_przeciwnika
     return wierzcholek_przeciwnika
 
-def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch):
-    """ wartościuje wierzcholek w przypadku powodzenia ustawia zbiór wolnych
-    pól siatki na puste, w pp wierzcholkowi nadawana jest wartość None"""
-    siatka = wierzcholek.siatka
-    aktywny_gracz = wierzcholek.gracz
-    if siatka.jest_zapelniona():
-        wierzcholek.wartosc = 0
-        return
-    if siatka.ma_uklad_wygrywajacy(ostatni_ruch):
-        wierzcholek.wartosc = aktywny_gracz.mnoznik
-        siatka.kasuj_wolne_pola()
+def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch,
+                           fun_wart=wartosciowanie.klasyczne_plus_minus):
+    a_siatka = wierzcholek.siatka
+    gracz = wierzcholek.gracz
+    wart = fun_wart(a_siatka, gracz, ostatni_ruch)
+    wierzcholek.wartosc = wart
 
 def dodaj_podwierzcholki(wierzcholek, stos, stopien=0):
     """ na podstawie zbioru wolnych pól na siatce dodaje
