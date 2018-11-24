@@ -58,7 +58,7 @@ def buduj_drzewo(stan_siatki, gracz_aktywny):
     stos.append(element)
     while stos:
         wierzcholek, ruch = stos.pop()
-        wartosciuj_wierzcholek(wierzcholek, ruch)
+        wartosciuj_wierzcholek(wierzcholek, ruch, wierzcholek,max_strony)
         dodaj_podwierzcholki(wierzcholek, stos)
         wierzcholek.siatka = None
     return wierzch_wyj

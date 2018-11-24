@@ -23,6 +23,7 @@ LEWO_DOL = _dodaj_tuple(LEWO, DOL)
 PRAWO_GORA = _dodaj_tuple(PRAWO, GORA)
 PRAWO_DOL = _dodaj_tuple(PRAWO, DOL)
 
+KIERUNKI = (LEWO, PRAWO, GORA, DOL, LEWO_GORA, LEWO_DOL, PRAWO_GORA, PRAWO_DOL)
 
 class Polozenie(tuple):
     """reprezentuje położenie"""
@@ -33,11 +34,6 @@ class Polozenie(tuple):
 
 class Siatka:
     """reprezentuje siatkę na której gracze stawiają symbole"""
-    def __init__(self, wierszy=15, kolumn=15):
-        self.pola = [[None] * kolumn for y in range(wierszy)]
-        self.wierszy = wierszy
-        self.kolumn = kolumn
-        self._wolne_pola = None
 
     def __repr_wiersz(self, num_wiersz):
         wyj = []
@@ -49,12 +45,47 @@ class Siatka:
                 wyj.append(".")
         return wyj
 
+    def _inicjuj_wolne_pola(self):
+        if self._wolne_pola is None:
+            self._wolne_pola = set(Polozenie((x, y))
+                                   for x in range(self.wierszy)
+                                   for y in range(self.kolumn))
+
+    def __init__(self, wierszy=15, kolumn=15):
+        self.pola = [[None] * kolumn for y in range(wierszy)]
+        self.wierszy = wierszy
+        self.kolumn = kolumn
+        self._wolne_pola = None
+        self.otoczenie = set()
+
+    def __getitem__(self, polozenie):
+        return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
+
+    def __setitem__(self, polozenie, symbol_gracza):
+        self._inicjuj_wolne_pola()
+        self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
+        self._wolne_pola.discard(polozenie)
+        self.zaktualizuj_otoczenie(polozenie)
+
     def __repr__(self):
         bufor = []
         for num_wiersza in range(self.wierszy):
             bufor.extend(self.__repr_wiersz(num_wiersza))
             bufor.append("\n")
         return "".join(bufor)
+
+    def zaktualizuj_otoczenie(self, polozenie):
+        """aktualizuje otoczenie wszystkich punktów siatki po dodaniu
+        symbolu na pozycji polozenie"""
+        def nalezy_do_wolnych(x):
+            return x in self._wolne_pola
+            
+        kandydat_otoczenie = {Polozenie(_dodaj_tuple(polozenie, kierunek))
+                           for kierunek in KIERUNKI}
+        otocz_polozenie = filter(self.zawiera_polozenie, kandydat_otoczenie)
+        self.otoczenie.discard(polozenie)
+        otocz_polozenie = filter(nalezy_do_wolnych, otocz_polozenie)
+        self.otoczenie.update(otocz_polozenie)
 
     def zawiera_polozenie(self, polozenie):
         return (0 <= polozenie[WIERSZ] < self.wierszy
@@ -64,27 +95,13 @@ class Siatka:
         wyjscie = Siatka(self.wierszy, self.kolumn)
         for numer, wiersz in enumerate(self.pola):
             wyjscie.pola[numer] = wiersz[:]
-        self.inicjuj_wolne_pola()
+        self._inicjuj_wolne_pola()
         wyjscie._wolne_pola = self._wolne_pola.copy()
         return wyjscie
-
-    def inicjuj_wolne_pola(self):
-        if self._wolne_pola is None:
-            self._wolne_pola = set(Polozenie((x, y))
-                                   for x in range(self.wierszy)
-                                   for y in range(self.kolumn))
 
     def kasuj_wolne_pola(self):
         """ ustawia zbiór wolnych pól na pusty """
         self._wolne_pola = set()
-
-    def __getitem__(self, polozenie):
-        return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
-
-    def __setitem__(self, polozenie, symbol_gracza):
-        self.inicjuj_wolne_pola()
-        self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
-        self._wolne_pola.discard(polozenie)
 
     def jest_zapelniona(self):
         """sprawdza czy plansza jest całkowicie wypełniona"""
@@ -133,5 +150,5 @@ class Siatka:
         return wyj
 
     def wolne_pola(self):
-        self.inicjuj_wolne_pola()
+        self._inicjuj_wolne_pola()
         return self._wolne_pola

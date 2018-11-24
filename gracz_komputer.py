@@ -16,7 +16,7 @@ class GraczKomputer(gracz.Gracz):
         self.przeciwnik.mnoznik = - 1
         czas = time.time()
         drzewo_decyzji = inteligencja.buduj_drzewo_stopnia(siatka_kopia,
-                                                           self, 6)
+                                                           self, 3)
         print("zbudowano drzewo w {} sekund".format(time.time() - czas))
         czas = time.time()
         ruch, wartosc = inteligencja.min_max(drzewo_decyzji, self)

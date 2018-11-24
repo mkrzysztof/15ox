@@ -80,5 +80,30 @@ class TestSiatka(ut.TestCase):
         self.assertEqual(3, ile)
         ile = siatka_t.policz_symbol(symbol, polozenie(1,2), siatka.LEWO)
         self.assertEqual(0, ile)
+
+    siatki = [siatka.Siatka(10, 10), siatka.Siatka(10, 10)]
+    polozenia = [siatka.Polozenie((2, 3)),
+                 siatka.Polozenie((0, 0)),
+    ]
+    wyniki = [
+        set(
+            [siatka.Polozenie((1, 2)), siatka.Polozenie((1, 3)),
+             siatka.Polozenie((1, 4)),
+             siatka.Polozenie((2, 2)), siatka.Polozenie((2, 4)),
+             siatka.Polozenie((3, 2)), siatka.Polozenie((3, 3)),
+             siatka.Polozenie((3, 4)),]
+        ),
+        set(
+            [siatka.Polozenie((0, 1)),
+             siatka.Polozenie((1, 0)), siatka.Polozenie((1, 1)),]
+        ),
+    ]
+    
+    def test_otoczenie(self):
+        for s, p, w in zip(self.siatki, self.polozenia, self.wyniki):
+            s[p] = "x"
+            testowany = s.otoczenie
+            self.assertEqual(w, testowany)
+
 if __name__ == "__main__":
     ut.main()
