@@ -1,5 +1,6 @@
 import drzewo
 import wartosciowanie
+import siatka
 
 def stworz_wierzcholek_przeciwnika(wierzcholek, ruch):
     """stwórz wierzcholek odpowiadający temu jak przeciwik wykona ruch"""
@@ -16,17 +17,19 @@ def dodaj_ruch_na_siatce(wierzcholek, ruch):
     return wierzcholek_przeciwnika
 
 def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch,
-                           fun_wart=wartosciowanie.klasyczne_plus_minus):
+                           fun_wart=wartosciowanie.max_strony):
     a_siatka = wierzcholek.siatka
     gracz = wierzcholek.gracz
     wart = fun_wart(a_siatka, gracz, ostatni_ruch)
     wierzcholek.wartosc = wart
 
-def dodaj_podwierzcholki(wierzcholek, stos, stopien=0):
+def dodaj_podwierzcholki(wierzcholek, stos, stopien=0,
+                         fun_wolne=siatka.Siatka.wolne_pola):
     """ na podstawie zbioru wolnych pól na siatce dodaje
     do wierzcholka potomków reprezentujących następny ruch
     następnie umieść je na stosie"""
-    wolne_pola = wierzcholek.siatka.wolne_pola()
+    siatka1 = wierzcholek.siatka
+    wolne_pola = fun_wolne(siatka1)
     for ruch in wolne_pola:
         pod_wierzcholek = dodaj_ruch_na_siatce(wierzcholek, ruch)
         element = (pod_wierzcholek, ruch, stopien)
@@ -46,7 +49,8 @@ def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, stopien):
             wartosciuj_wierzcholek(wierzcholek, ruch)
             if licznik_stopnia == stopien - 1 and wierzcholek.wartosc is None:
                 wierzcholek.wartosc = 0
-            dodaj_podwierzcholki(wierzcholek, stos, licznik_stopnia + 1)
+            dodaj_podwierzcholki(wierzcholek, stos, licznik_stopnia + 1,
+                                 siatka.Siatka.otoczenie)
             wierzcholek.siatka = None
     return wierzch_wyj
 

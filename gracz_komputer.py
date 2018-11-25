@@ -21,4 +21,5 @@ class GraczKomputer(gracz.Gracz):
         czas = time.time()
         ruch, wartosc = inteligencja.min_max(drzewo_decyzji, self)
         print("obliczono min_max w {} sekund".format(time.time() - czas))
+        print("wartość funkcji celu = {}".format(wartosc))
         return ruch

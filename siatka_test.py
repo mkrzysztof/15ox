@@ -102,7 +102,7 @@ class TestSiatka(ut.TestCase):
     def test_otoczenie(self):
         for s, p, w in zip(self.siatki, self.polozenia, self.wyniki):
             s[p] = "x"
-            testowany = s.otoczenie
+            testowany = s.otoczenie()
             self.assertEqual(w, testowany)
 
 if __name__ == "__main__":

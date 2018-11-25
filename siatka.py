@@ -56,7 +56,7 @@ class Siatka:
         self.wierszy = wierszy
         self.kolumn = kolumn
         self._wolne_pola = None
-        self.otoczenie = set()
+        self._otoczenie = set()
 
     def __getitem__(self, polozenie):
         return self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]]
@@ -65,7 +65,7 @@ class Siatka:
         self._inicjuj_wolne_pola()
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
         self._wolne_pola.discard(polozenie)
-        self.zaktualizuj_otoczenie(polozenie)
+        self.zaktualizuj__otoczenie(polozenie)
 
     def __repr__(self):
         bufor = []
@@ -74,18 +74,18 @@ class Siatka:
             bufor.append("\n")
         return "".join(bufor)
 
-    def zaktualizuj_otoczenie(self, polozenie):
-        """aktualizuje otoczenie wszystkich punktów siatki po dodaniu
+    def zaktualizuj__otoczenie(self, polozenie):
+        """aktualizuje _otoczenie wszystkich punktów siatki po dodaniu
         symbolu na pozycji polozenie"""
         def nalezy_do_wolnych(x):
             return x in self._wolne_pola
             
-        kandydat_otoczenie = {Polozenie(_dodaj_tuple(polozenie, kierunek))
+        kandydat__otoczenie = {Polozenie(_dodaj_tuple(polozenie, kierunek))
                            for kierunek in KIERUNKI}
-        otocz_polozenie = filter(self.zawiera_polozenie, kandydat_otoczenie)
-        self.otoczenie.discard(polozenie)
+        otocz_polozenie = filter(self.zawiera_polozenie, kandydat__otoczenie)
+        self._otoczenie.discard(polozenie)
         otocz_polozenie = filter(nalezy_do_wolnych, otocz_polozenie)
-        self.otoczenie.update(otocz_polozenie)
+        self._otoczenie.update(otocz_polozenie)
 
     def zawiera_polozenie(self, polozenie):
         return (0 <= polozenie[WIERSZ] < self.wierszy
@@ -97,6 +97,7 @@ class Siatka:
             wyjscie.pola[numer] = wiersz[:]
         self._inicjuj_wolne_pola()
         wyjscie._wolne_pola = self._wolne_pola.copy()
+        wyjscie._otoczenie = set(self._otoczenie)
         return wyjscie
 
     def kasuj_wolne_pola(self):
@@ -152,3 +153,6 @@ class Siatka:
     def wolne_pola(self):
         self._inicjuj_wolne_pola()
         return self._wolne_pola
+
+    def otoczenie(self):
+        return self._otoczenie
