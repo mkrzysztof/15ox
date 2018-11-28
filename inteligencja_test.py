@@ -1,3 +1,4 @@
+import wartosciowanie
 import inteligencja
 import siatka
 import gracz
@@ -26,7 +27,8 @@ class TestInteligencja(ut.TestCase):
         gr2.przeciwnik = gr1
         w1 = drzewo.Wierzcholek(siatka1, gr1)
         w2 = inteligencja.dodaj_ruch_na_siatce(w1, ruch)
-        inteligencja.wartosciuj_wierzcholek(w2, ruch)
+        inteligencja.wartosciuj_wierzcholek(w2, ruch,
+                                            wartosciowanie.klasyczne_plus_minus)
         self.assertEqual(None, w2.wartosc)
 
     def test_wartosciuj_wierzcholek_zap(self):
@@ -50,7 +52,8 @@ class TestInteligencja(ut.TestCase):
                  (siatka.Polozenie((2,2)), gr2),}
         for ruch, gr in ruchy:
             w.siatka[ruch] = gr.symbol
-        inteligencja.wartosciuj_wierzcholek(w, siatka.Polozenie((2,0)))
+        inteligencja.wartosciuj_wierzcholek(w, siatka.Polozenie((2,0)),
+                                            wartosciowanie.klasyczne_plus_minus)
         wartosc = w.wartosc
         self.assertEqual(0, wartosc)
 
