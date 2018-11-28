@@ -1,5 +1,4 @@
-#import grafika
-import plansza
+"""symbole kólka i krzyżyka występujące w grze"""
 import zarzadca
 
 
@@ -18,13 +17,11 @@ class Symbol(object):
 
 class Kolko(Symbol):
     """sybol kółka"""
-    #repr_graf = grafika.Kolko_graf()
     repr = "o"
     komunikat = "kolko"
 
 class Krzyzyk(Symbol):
     """symbol krzyżyk"""
-    #repr_graf = grafika.Krzyzyk_graf()
     repr = "x"
     komunikat = "krzyzyk"
 

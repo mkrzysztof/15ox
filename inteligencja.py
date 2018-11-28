@@ -1,8 +1,9 @@
+"""odpowiada za inteligencję, głównie budowa i ocena drzewa gry"""
 import drzewo
 import wartosciowanie
 import siatka
 
-FUN_WART = wartosciowanie.klasyczne_plus_minus
+FUN_WART = wartosciowanie.max_strony
 
 def stworz_wierzcholek_przeciwnika(wierzcholek, ruch):
     """stwórz wierzcholek odpowiadający temu jak przeciwik wykona ruch"""
@@ -20,6 +21,7 @@ def dodaj_ruch_na_siatce(wierzcholek, ruch):
 
 def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch,
                            fun_wart=wartosciowanie.max_strony):
+    """oceń wierzchołek na podstawie sytuacji i ostatnio wykonanego ruchu"""
     a_siatka = wierzcholek.siatka
     gracz = wierzcholek.gracz
     wart = fun_wart(a_siatka, gracz, ostatni_ruch)
@@ -49,17 +51,19 @@ def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc):
         wierzcholek, ruch, licznik_stopnia = stos.pop()
         if licznik_stopnia < glebokosc:
             wartosciuj_wierzcholek(wierzcholek, ruch, FUN_WART)
-            if licznik_stopnia == glebokosc - 1 and wierzcholek.wartosc is None:
+            if (licznik_stopnia == glebokosc - 1
+                and wierzcholek.wartosc is None):
                 wierzcholek.wartosc = 0
             dodaj_podwierzcholki(wierzcholek, stos, licznik_stopnia + 1,
                                  siatka.Siatka.otoczenie)
             wierzcholek.siatka = None
     return wierzch_wyj
 
-def klucz(x):
-    return x[1]
+def _klucz(lst):
+    return lst[1]
 
 def min_max(wierzcholek, gracz_aktywny):
+    """algorytm min-max na drzewie o wierzchołku wierzcholek"""
     wartosc = wierzcholek.wartosc
     ruch = None
     fun_por = max if (wierzcholek.gracz != gracz_aktywny) else min
@@ -68,6 +72,6 @@ def min_max(wierzcholek, gracz_aktywny):
         for ruch, dziecko in wierzcholek.items():
             _, dziecko.wartosc = min_max(dziecko, gracz_aktywny)
             wartosci[ruch] = dziecko.wartosc
-        ruch, wartosc = fun_por(wartosci.items(), key=klucz)
+        ruch, wartosc = fun_por(wartosci.items(), key=_klucz)
         wierzcholek.wartosc = wartosc
     return (ruch, wartosc)

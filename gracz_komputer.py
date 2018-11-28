@@ -4,7 +4,7 @@ import gracz
 import inteligencja
 from monitoring import pokaz_wywolanie
 
-GLEBOKOSC = 8
+GLEBOKOSC = 4
 
 class GraczKomputer(gracz.Gracz):
     """Klasa reprezentująca komputer"""

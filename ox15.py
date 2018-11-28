@@ -1,20 +1,17 @@
 """Gra"""
+import time
 import pygame
 import siatka
 import plansza
-import symbol
-import gracz
 import grafika
 import zarzadca
-import gracz_komputer
 import plansza_wyboru_mod as pwm
-from monitoring import pokaz_wywolanie
 import plansza_koncowa
-import time
 
 
+plansza_koncowa.init()
 def czy_koniec(biezacy_gracz, remis):
-    return (biezacy_gracz.wygrana or biezacy_gracz.przeciwnik.wygrana or remis)
+    return biezacy_gracz.wygrana or biezacy_gracz.przeciwnik.wygrana or remis
 
 def pokaz_wygrana(biezacy_gracz, plansza):
     biezacy_gracz.ustaw_wygrana()
@@ -28,7 +25,7 @@ def pokaz_remis(biezacy_gracz, plansza):
     return remis
 
 def zdecyduj_o_koncu(biezacy_gracz, polozenie, plansza):
-    """ zdecyduj no końcu dla bieżącego gracza na podstawie ostatniego 
+    """ zdecyduj no końcu dla bieżącego gracza na podstawie ostatniego
     położenia dla danej planszy """
     remis = False
     if plansza.ma_uklad_wygrywajacy(polozenie):
@@ -42,7 +39,8 @@ def zdecyduj_o_koncu(biezacy_gracz, polozenie, plansza):
 def gra(pierwszy_gracz, drugi_gracz, plansza):
     """Główna procedura rozgrywki"""
     remis = False
-    biezacy_gracz = pierwszy_gracz        
+    biezacy_gracz = pierwszy_gracz
+    pierwszy_gracz.dodaj_przeciwnika(drugi_gracz)
     while not czy_koniec(biezacy_gracz, remis):
         zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
         polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)

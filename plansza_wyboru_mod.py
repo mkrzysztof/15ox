@@ -1,12 +1,12 @@
 """zawiera ustawienia gry"""
 import gracz
-import symbol
+import symbole
 import gracz_komputer
 
 PLANSZA_ROZMIAR = (15, 15)
 WYGRYWAJACYCH = 3
-GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz1")
-GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz2")
+GRACZ1 = gracz.GraczCzlowiek(symbole.Kolko, "Gracz1")
+GRACZ2 = gracz.GraczCzlowiek(symbole.Krzyzyk, "Gracz2")
 GRACZ1.przeciwnik = GRACZ2
 GRACZ2.przeciwnik = GRACZ1
 
@@ -19,7 +19,7 @@ def wybierz_xo():
     WYGRYWAJACYCH = 3
 
 def wybierz_5():
-    """gra 5 symboli w jednej linii"""
+    """gra 5 symbolei w jednej linii"""
     global PLANSZA_ROZMIAR, WYGRYWAJACYCH
     WYGRYWAJACYCH = 5
     PLANSZA_ROZMIAR = (10, 10)
@@ -38,21 +38,21 @@ def wybierz_15x15():
 
 def wybierz_gracz_gracz():
     global GRACZ1, GRACZ2
-    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz1")
-    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz2")
+    GRACZ1 = gracz.GraczCzlowiek(symbole.Kolko, "Gracz1")
+    GRACZ2 = gracz.GraczCzlowiek(symbole.Krzyzyk, "Gracz2")
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
 
 def wybierz_gracz_komputer():
     global GRACZ1, GRACZ2
-    GRACZ1 = gracz.GraczCzlowiek(symbol.Kolko, "Gracz1")
-    GRACZ2 = gracz_komputer.GraczKomputer(symbol.Krzyzyk, "Gracz2")
+    GRACZ1 = gracz.GraczCzlowiek(symbole.Kolko, "Gracz1")
+    GRACZ2 = gracz_komputer.GraczKomputer(symbole.Krzyzyk, "Gracz2")
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
 
 def wybierz_komputer_gracz():
     global GRACZ1, GRACZ2
-    GRACZ1 = gracz_komputer.GraczKomputer(symbol.Kolko, "Gracz1")
-    GRACZ2 = gracz.GraczCzlowiek(symbol.Krzyzyk, "Gracz2")
+    GRACZ1 = gracz_komputer.GraczKomputer(symbole.Kolko, "Gracz1")
+    GRACZ2 = gracz.GraczCzlowiek(symbole.Krzyzyk, "Gracz2")
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
