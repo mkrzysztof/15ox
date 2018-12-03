@@ -14,7 +14,7 @@ class TestInteligencja(ut.TestCase):
         gr2.przeciwnik = gr1
         w1 = drzewo.Wierzcholek(siatka1, gr1)
         ruch = siatka.Polozenie((0,0))
-        w2 = inteligencja.stworz_wierzcholek_przeciwnika(w1, ruch)
+        w2 = inteligencja._stworz_wierzcholek_przeciwnika(w1, ruch)
         self.assertEqual(gr2, w2.gracz)
         self.assertEqual("o", w2.siatka[ruch])
 
@@ -26,8 +26,8 @@ class TestInteligencja(ut.TestCase):
         gr1.przeciwnik = gr2
         gr2.przeciwnik = gr1
         w1 = drzewo.Wierzcholek(siatka1, gr1)
-        w2 = inteligencja.dodaj_ruch_na_siatce(w1, ruch)
-        inteligencja.wartosciuj_wierzcholek(w2, ruch,
+        w2 = inteligencja._dodaj_ruch_na_siatce(w1, ruch)
+        inteligencja._wartosciuj_wierzcholek(w2, ruch,
                                             wartosciowanie.klasyczne_plus_minus)
         self.assertEqual(None, w2.wartosc)
 
@@ -52,7 +52,7 @@ class TestInteligencja(ut.TestCase):
                  (siatka.Polozenie((2,2)), gr2),}
         for ruch, gr in ruchy:
             w.siatka[ruch] = gr.symbol
-        wartosc = inteligencja.wartosciuj_wierzcholek(w,
+        wartosc = inteligencja._wartosciuj_wierzcholek(w,
                                                       siatka.Polozenie((2,0)),
                                             wartosciowanie.klasyczne_plus_minus)
         self.assertEqual(0, wartosc)
