@@ -1,6 +1,5 @@
 """odpowiada za inteligencję, głównie budowa i ocena drzewa gry"""
 import drzewo
-
 import siatka
 
 
@@ -37,20 +36,21 @@ def _dodaj_podwierzcholki(wierzcholek, stos, glebokosc, fun_wolne):
         element = (pod_wierzcholek, ruch, glebokosc)
         stos.append(element)
 
-def _ocen_lub_dodaj(wierzcholek, licznik_stopnia, fun_wolne, fun_wart,
-                   ostatni_ruch, stos):
+def _ocen_lub_dodaj(wierzcholek, licznik_stopnia, fun_oceny, ostatni_ruch,
+                    stos):
     """w zależności od sytuacji oceń wierzchołek, lub dodaj do niego
     podwierzchołki, wkładając je na stos, wolne wierzchołki określa funkcja
     fun_wolne, dla ostatnio wykonanego ruchu"""
     siatka_wierzch = wierzcholek.siatka
-    ocena = _wartosciuj_wierzcholek(wierzcholek, ostatni_ruch, fun_wart)
+    ocena = _wartosciuj_wierzcholek(wierzcholek, ostatni_ruch,
+                                    fun_oceny["wartosc"])
     if siatka_wierzch.jest_zapelniona():
         wierzcholek.wartosc = 0
     elif siatka_wierzch.ma_uklad_wygrywajacy(ostatni_ruch):
         wierzcholek.wartosc = ocena
     else:
         _dodaj_podwierzcholki(wierzcholek, stos, licznik_stopnia + 1,
-                              fun_wolne)
+                              fun_oceny["wolne"])
 
 def _stworz_korzen(stan_siatki, gracz_aktywny, stos):
     """stwórz korzeń drzewa i poślij jego "parametry" na stos
@@ -63,19 +63,19 @@ def _stworz_korzen(stan_siatki, gracz_aktywny, stos):
     stos.append(element)
     return wierzch_wyj
 
-def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc, fun_wolne,
-                         fun_wart):
-    """buduj drzewo o zadanej głębokości. Korzeń zawiera sytuację po ostatnim 
+def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc, fun_oceny):
+    """buduj drzewo o zadanej głębokości. Korzeń zawiera sytuację po ostatnim
     ruchu przeciwnika.W przypadku początku gry jest pusta siatka """
     stos = []
     wierzch_wyj = _stworz_korzen(stan_siatki, gracz_aktywny, stos)
     while stos:
         wierzcholek, ruch, licznik_stopnia = stos.pop()
         if licznik_stopnia < glebokosc:
-            _ocen_lub_dodaj(wierzcholek, licznik_stopnia, fun_wolne, fun_wart,
-                           ruch, stos)
+            _ocen_lub_dodaj(wierzcholek, licznik_stopnia, fun_oceny, ruch,
+                            stos)
         else:
-            ocena = _wartosciuj_wierzcholek(wierzcholek, ruch, fun_wart)
+            ocena = _wartosciuj_wierzcholek(wierzcholek, ruch,
+                                            fun_oceny["wartosc"])
             wierzcholek.wartosc = ocena
         wierzcholek.siatka = None
     return wierzch_wyj
