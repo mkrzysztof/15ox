@@ -1,9 +1,8 @@
 """odpowiada za inteligencję, głównie budowa i ocena drzewa gry"""
 import drzewo
-import wartosciowanie
+
 import siatka
 
-FUN_WART = wartosciowanie.klasyczne_plus_minus
 
 def stworz_wierzcholek_przeciwnika(wierzcholek, ruch):
     """stwórz wierzcholek odpowiadający temu jak przeciwik wykona ruch"""
@@ -19,8 +18,7 @@ def dodaj_ruch_na_siatce(wierzcholek, ruch):
     wierzcholek[ruch] = wierzcholek_przeciwnika
     return wierzcholek_przeciwnika
 
-def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch,
-                           fun_wart=wartosciowanie.max_strony):
+def wartosciuj_wierzcholek(wierzcholek, ostatni_ruch, fun_wart):
     """oceń wierzchołek na podstawie sytuacji i ostatnio wykonanego ruchu"""
     a_siatka = wierzcholek.siatka
     gracz = wierzcholek.gracz
@@ -39,7 +37,8 @@ def dodaj_podwierzcholki(wierzcholek, stos, glebokosc=0,
         element = (pod_wierzcholek, ruch, glebokosc)
         stos.append(element)
 
-def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc, fun_wolne):
+def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc, fun_wolne,
+                         fun_wart):
     """buduj drzewo o zadanej głębokości. Korzeń zawiera sytuację
     po ostatnim ruchu przeciwnika
     W przypadku początku gry jest pusta siatka """
@@ -52,7 +51,7 @@ def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc, fun_wolne):
     stos.append(element)
     while stos:
         wierzcholek, ruch, licznik_stopnia = stos.pop()
-        ocena = wartosciuj_wierzcholek(wierzcholek, ruch, FUN_WART)
+        ocena = wartosciuj_wierzcholek(wierzcholek, ruch, fun_wart)
         if licznik_stopnia < glebokosc:
             if wierzcholek.siatka.jest_zapelniona():
                 wierzcholek.wartosc = 0
