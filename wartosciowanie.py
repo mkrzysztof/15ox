@@ -6,7 +6,7 @@ import siatka
 def klasyczne_plus_minus(biez_siatka, gracz, ostatni_ruch):
     """ gracz.mnoznik -- gracz wygrywa
     0 -- remis"""
-    wyj = None
+    wyj = 0
     if biez_siatka.jest_zapelniona():
         wyj = 0
     elif biez_siatka.ma_uklad_wygrywajacy(ostatni_ruch):

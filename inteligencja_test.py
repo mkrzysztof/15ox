@@ -52,9 +52,9 @@ class TestInteligencja(ut.TestCase):
                  (siatka.Polozenie((2,2)), gr2),}
         for ruch, gr in ruchy:
             w.siatka[ruch] = gr.symbol
-        inteligencja.wartosciuj_wierzcholek(w, siatka.Polozenie((2,0)),
+        wartosc = inteligencja.wartosciuj_wierzcholek(w,
+                                                      siatka.Polozenie((2,0)),
                                             wartosciowanie.klasyczne_plus_minus)
-        wartosc = w.wartosc
         self.assertEqual(0, wartosc)
 
 if __name__ == "__main__":
