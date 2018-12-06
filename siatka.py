@@ -159,3 +159,6 @@ class Siatka:
 
 def wolne_pola(siatka1):
     return siatka1.wolne_pola()
+
+def otoczenie(siatka1):
+    return siatka1.otoczenie()
