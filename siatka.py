@@ -46,7 +46,7 @@ class Siatka:
         return wyj
 
     def _inicjuj_wolne_pola(self):
-        if self._wolne_pola is None:
+        if not self._wolne_pola:
             self._wolne_pola = set(Polozenie((x, y))
                                    for x in range(self.wierszy)
                                    for y in range(self.kolumn))
@@ -65,7 +65,7 @@ class Siatka:
         self._inicjuj_wolne_pola()
         self.pola[polozenie[WIERSZ]][polozenie[KOLUMNA]] = symbol_gracza
         self._wolne_pola.discard(polozenie)
-        self.zaktualizuj__otoczenie(polozenie)
+        self.zaktualizuj_otoczenie(polozenie)
 
     def __repr__(self):
         bufor = []
@@ -74,17 +74,17 @@ class Siatka:
             bufor.append("\n")
         return "".join(bufor)
 
-    def zaktualizuj__otoczenie(self, polozenie):
+    def _nalezy_do_wolnych(self, x):
+        return x in self._wolne_pola
+
+    def zaktualizuj_otoczenie(self, polozenie):
         """aktualizuje _otoczenie wszystkich punktów siatki po dodaniu
         symbolu na pozycji polozenie"""
-        def nalezy_do_wolnych(x):
-            return x in self._wolne_pola
-            
-        kandydat__otoczenie = {Polozenie(_dodaj_tuple(polozenie, kierunek))
+        kandydat_otoczenie = {Polozenie(_dodaj_tuple(polozenie, kierunek))
                            for kierunek in KIERUNKI}
-        otocz_polozenie = filter(self.zawiera_polozenie, kandydat__otoczenie)
+        otocz_polozenie = filter(self.zawiera_polozenie, kandydat_otoczenie)
         self._otoczenie.discard(polozenie)
-        otocz_polozenie = filter(nalezy_do_wolnych, otocz_polozenie)
+        otocz_polozenie = filter(self._nalezy_do_wolnych, otocz_polozenie)
         self._otoczenie.update(otocz_polozenie)
 
     def zawiera_polozenie(self, polozenie):
@@ -159,3 +159,6 @@ class Siatka:
 
 def wolne_pola(siatka1):
     return siatka1.wolne_pola()
+
+def otoczenie(siatka1):
+    return siatka1.otoczenie()

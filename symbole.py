@@ -28,3 +28,7 @@ class Krzyzyk(Symbol):
 class Puste(Symbol):
     """pusty"""
     repr = "."
+
+def przeciwny(symbol):
+    assert symbol != Puste
+    return Kolko if symbol == Krzyzyk else Krzyzyk

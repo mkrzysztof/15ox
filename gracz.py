@@ -21,10 +21,10 @@ class Gracz(object):
         self.przeciwnik = przeciwnik
         przeciwnik.przeciwnik = self
 
-    def postaw_symbol_na_planszy(self, plansza):
+    def postaw_symbol_na_planszy(self, ostatnie_polozenie, plansza):
         """wybiera dogodne położenie i stawia na niej swój symbol
         zwraca to położenie"""
-        polozenie = self.wyszukaj_wolne_pole(plansza.pola)
+        polozenie = self.wyszukaj_wolne_pole(ostatnie_polozenie, plansza.pola)
         self.symbol.postaw_na_planszy(plansza, polozenie)
         return polozenie
 
@@ -37,7 +37,7 @@ class Gracz(object):
 class GraczCzlowiek(Gracz):
     """Klasa reprezentująca człowieka"""
 
-    def wyszukaj_wolne_pole(self, siatka):
+    def wyszukaj_wolne_pole(self, ostatnie_polozenie, siatka):
         zla_pozycja = True
         while zla_pozycja:
             polozenie = grafika.odczyt_poz_myszy()

@@ -41,9 +41,10 @@ def gra(pierwszy_gracz, drugi_gracz, plansza):
     remis = False
     biezacy_gracz = pierwszy_gracz
     pierwszy_gracz.dodaj_przeciwnika(drugi_gracz)
+    polozenie = None
     while not czy_koniec(biezacy_gracz, remis):
         zarzadca.rozeslij('wyswietl-gracza', biezacy_gracz, plansza.surface)
-        polozenie = biezacy_gracz.postaw_symbol_na_planszy(plansza)
+        polozenie = biezacy_gracz.postaw_symbol_na_planszy(polozenie, plansza)
         biezacy_gracz, remis = zdecyduj_o_koncu(biezacy_gracz, polozenie,
                                                 plansza)
     # pauza

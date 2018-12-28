@@ -13,3 +13,6 @@ dodanie efektów graficznych:
      imię gracza
 
 dorobić przycisk zatwierdzający
+
+w alfa_beta znaleziony na samym dole ruch kop[iuje się na górę,
+nie powinno tak być

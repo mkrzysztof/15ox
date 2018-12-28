@@ -1,67 +1,83 @@
 """moduł realizuje algoirytm alfa-beta odcinania"""
-
-import enum
+import copy
+import operator
 import gracz_komputer
 import siatka
+import wartosciowanie
 
-def _przeciwna(faza):
-    #odwraca fazę na przeciwną
-    return "beta" if faza == "alfa" else "alfa"
+GRACZE = {"ALFA" : "KOMPUTER",
+          "BETA": "CZLOWIEK"}
+LIMIT = 4
 
-_PUSTE = siatka.Polozenie() # pusty ruch
 
-_LIMIT_POZIOM = 2
-def _brak_konca(glebokosc, ocena):
-    # prawda jeśli głebokość nie przekroczyła dopuszczalny limit
-    # lub sytuacja nie jest wygrana
-    return glebokosc < _LIMIT_POZIOM and abs(ocena) < siatka.WYGRYWAJACYCH
+class OcenaRuchu:
+    """struktura ma przedstawiać wartość czyli ocena, oraz argument czyli
+    ruch który realizuje tą wartość"""
+    def __init__(self):
+        self.ocena = None
+        self.ruch = None
 
-def _przeciwnik(gracz):
-    return "CZLOWIEK" if gracz == "KOMPUTER" else "KOMPUTER"
+    def __repr__(self):
+        return "ocena = {0}, ruch = {1}".format(self.ocena, self.ruch)
 
-def _dodaj_ruch(gracz, stan_gry, ruch):
-    # zwraca stan_gry po dodaniu ruchu
-    # gracz - to "CZLOWIEK", "KOMPUTER"
-    nowa_siatka = stan_gry["siatka"].copy()
-    nowa_siatka[ruch] = gracz_komputer.Gracze[gracz]["symbol"]
-    return {"siatka": nowa_siatka, "ostatni_ruch": ruch}
+    def __eq__(self, value):
+        return (self.ocena == value.ocena
+                and self.ruch == value.ruch)
 
-def alfa_beta(stan_gry, glebokosc, ograniczenie, fun_oceny, fun_wolne, faza):
-    """wykonuje algorytm alfa-beta, z danego stan_gry, znajdując się 
-    na biez_poziom "myślenia", będąc w wybranej fazie, mając daną funcję oceny
-    i funkcję wyznaczającą ruchy do wykonania. 
-    Zwraca parę (wartość_ruchu, wybrany_ruch)
+def przeciwny(etap):
+    return "BETA" if etap == "ALFA" else "ALFA"
 
-    stan_gry - stan przed wykonaniem ruchu
-    glebokosc - głębokość na której przeszukiwane jest drzewo gry
-    ograniczenie - słownik {"alfa": int, "beta": int}
-    fun_oceny - funkcja oceniająca na podstawie stanu gry sytuację
-    faza - <"alfa", "beta"> - jedna z faz w której znajduje się
-    algorytm"""
-    def _ocen_ruch(nowy_ruch, ograniczenia):
-        nowy_stan = _dodaj_ruch(gracz_oceniany, stan_gry, ruch)
-        ocena_nowy, _ = alfa_beta(nowy_stan, glebokosc+1, ograniczenie,
-                                  fun_oceny,
-                                  fun_wolne, _przeciwna(faza))
-        return ocena_nowy
-    porownanie = {"alfa": max, "beta": min} # funkcje porównujące
-    fazy_graczy = {"alfa": "KOMPUTER", "beta": "CZLOWIEK"}
-    gracz_oceniany = fazy_graczy[faza]
-    ruch_wyj = stan_gry["ostatni_ruch"]
-    ocena = fun_oceny(stan_gry, _przeciwnik(gracz_oceniany)) # oceniamy korzeń
-    if _brak_konca(glebokosc, ocena):
-        ocena = 0
-        ruchy_iter = iter(fun_wolne(stan_gry["siatka"]))
-        ruch_wyj = ruch = next(ruchy_iter, _PUSTE)
-        while ruch:
-            ocena_nowy = _ocen_ruch(ruch, ograniczenia)
-            print("max czy min", porownanie[faza], faza)
-            ograniczenie[faza] = porownanie[faza](ograniczenie[faza],
-                                                  ocena_nowy)
-            ocena = ograniczenie[faza]
-            if ograniczenie["alfa"] >= ograniczenie["beta"]:
-                ocena = ograniczenie[_przeciwna(faza)]
-                ruch = _PUSTE
-            ruch_wyj = ruch
-            ruch = next(ruchy_iter, _PUSTE)
-    return (ocena, ruch_wyj)
+def czy_to_koniec(siatka_wej, ruch, etap, poziom):
+    stan_gry = {"siatka": siatka_wej, "ostatni_ruch": ruch}
+    koniec = False
+    ocena = wartosciowanie.max_strony(stan_gry, GRACZE[etap])
+    if poziom < LIMIT:
+        if abs(ocena) >= siatka.WYGRYWAJACYCH:
+            koniec = True
+        elif siatka_wej.jest_zapelniona():
+            koniec = True
+    else:
+        koniec = True
+    return koniec
+
+def ocen_sytuacje(siatka_wej, ostatni_ruch, gracz):
+    stan_gry = {"siatka": siatka_wej, "ostatni_ruch": ostatni_ruch}
+    wyjscie = OcenaRuchu()
+    ocena = wartosciowanie.max_strony(stan_gry, gracz)
+    wyjscie.ruch = ostatni_ruch
+    wyjscie.ocena = ocena
+    return wyjscie
+
+def stworz_siatke(siatka_wej, ruch, symbol):
+    siatka_wyj = siatka_wej.copy()
+    siatka_wyj[ruch] = symbol
+    return siatka_wyj
+
+_porownanie = {"ALFA": operator.gt, "BETA":operator.lt}
+def alfa_beta(siatka_wej, ruch, oceny, poziom, etap):
+    """zwraca ocenę i ruch które są w danej chwili najlepsze
+    na podstawie ostatnio wykonanego ruchu, mając dane oceny,
+    przy danym poziomie na danym etapie
+    siatka - typu Siatka
+    ruch - typu Polozenie
+    oceny - słownik z kluczami "ALFA", "BETA" o wartościach OcenaRuchu
+    etap {"ALFA", "BETA"} """
+    kopia_oceny = copy.copy(oceny)
+    przeciwny_etap = przeciwny(etap)
+    biezacy_parametry = gracz_komputer.Gracze_Parametry[GRACZE[etap]]
+    if czy_to_koniec(siatka_wej, ruch, etap, poziom):
+        wyjscie = ocen_sytuacje(siatka_wej, ruch, GRACZE[przeciwny_etap])
+    else:
+        dostepne_ruchy = siatka.otoczenie(siatka_wej)
+        for wolny_ruch in dostepne_ruchy:
+            nast_siatka = stworz_siatke(siatka_wej, wolny_ruch,
+                                        biezacy_parametry["symbol"])
+            wynik = alfa_beta(nast_siatka, wolny_ruch, kopia_oceny,
+                              poziom + 1, przeciwny_etap)
+            if _porownanie[etap](wynik.ocena, kopia_oceny[etap].ocena):
+                kopia_oceny[etap] = wynik
+            if kopia_oceny["ALFA"].ocena >= kopia_oceny["BETA"].ocena:
+                wyjscie = kopia_oceny[przeciwny_etap]
+                break
+        wyjscie = kopia_oceny[etap]
+    return wyjscie

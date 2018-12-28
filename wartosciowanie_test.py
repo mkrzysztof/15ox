@@ -31,11 +31,12 @@ class TestWartosciowanie(unittest.TestCase):
             [(2, 0), "o"],
         ]
         gracz = unittest.mock.Mock()
-        gracz.mnoznik = 1
         siatka1 = stworz_siatke(3, 3, wypelnienie)
-        testowany = wartosciowanie.klasyczne_plus_minus(
-            siatka1, gracz, siatka.Polozenie((0, 1))
-        )
+        stan_gry = {
+            "siatka": siatka1,
+            "ostatni_ruch": siatka.Polozenie([0,0])
+            }
+        testowany = wartosciowanie.klasyczne_plus_minus(stan_gry, "KOMPUTER")
         self.assertEqual(1, testowany)
         
     def siatka2(self):
@@ -57,17 +58,26 @@ class TestMaxStrony(unittest.TestCase):
 
     def test1(self):
         siatka1 = stworz_siatke(10, 10, self.wypelnienie1)
-        gracz = unittest.mock.Mock()
-        gracz.mnoznik = 1
-        testowany = wartosciowanie.max_strony(siatka1, gracz,
-                                              siatka.Polozenie((3,2)))
+        stan_gry = {"siatka": siatka1,
+                    "ostatni_ruch": siatka.Polozenie((3,2))
+                    }
+        gracz = "KOMPUTER"
+        testowany = wartosciowanie.max_strony(stan_gry, gracz)
         self.assertEqual(6, testowany)
-        testowany = wartosciowanie.max_strony(siatka1, gracz,
-                                              siatka.Polozenie((2,2)))
-        self.assertEqual(4, testowany)
-        
-    
-
+                
+    def test_3x3(self):
+        wypelnienie = [
+            [(0, 0), "o"], [(1, 0), "o"], [(2, 0), "o"],
+            [(0, 1), "x"], [(0, 2), "x"],
+        ]
+        siatka_test = stworz_siatke(3, 3, wypelnienie)
+        stan_gry = {"siatka": siatka_test,
+                    "ostatni_ruch": siatka.Polozenie((2, 0))
+                    }
+        gracz = "KOMPUTER"
+        testowany = wartosciowanie.max_strony(stan_gry, gracz)
+        self.assertEqual(3, testowany)
+            
 
 if __name__ == "__main__":
     unittest.main()

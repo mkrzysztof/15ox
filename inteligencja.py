@@ -1,7 +1,9 @@
 """odpowiada za inteligencję, głównie budowa i ocena drzewa gry"""
 import drzewo
 import siatka
+import wartosciowanie
 
+LIMIT = 3
 
 def _stworz_wierzcholek_przeciwnika(wierzcholek, ruch):
     """stwórz wierzcholek odpowiadający temu jak przeciwik wykona ruch"""
@@ -83,16 +85,80 @@ def buduj_drzewo_stopnia(stan_siatki, gracz_aktywny, glebokosc, fun_oceny):
 def _klucz(lst):
     return lst[1]
 
-def min_max(wierzcholek, gracz_aktywny):
-    """algorytm min-max na drzewie o wierzchołku wierzcholek"""
-    wartosc = wierzcholek.wartosc
-    ruch = None
-    fun_por = max if (wierzcholek.gracz != gracz_aktywny) else min
-    if wierzcholek.items():
-        wartosci = {}
-        for ruch, dziecko in wierzcholek.items():
-            _, dziecko.wartosc = min_max(dziecko, gracz_aktywny)
-            wartosci[ruch] = dziecko.wartosc
-        ruch, wartosc = fun_por(wartosci.items(), key=_klucz)
-        wierzcholek.wartosc = wartosc
-    return (ruch, wartosc)
+def dodaj_ruch(siatka, ruch, gracz):
+    """ dodaje ruch do siatki
+    gracz - gracz który wykonuje ruch
+    zwraca parę siatka + ruch, ruch"""
+    nast_siatka = siatka.copy()
+    nast_siatka[ruch] = gracz.symbol
+    return (nast_siatka, ruch)
+
+def stan_jest_koncowy(stan):
+    siatka, ostatni_ruch = stan
+    return (siatka.jest_zapelniona()
+            or siatka.ma_uklad_wygrywajacy(ostatni_ruch))
+
+def alfa_max(stan, gracz, poziom, fun_oceny):
+    """faza alfa algorytmu alfa-beta,
+    stan - stan gry (siatka, ostatni ruch)\
+    fun_oceny - funkcja wartości i funkcja otoczenia dla siatki
+    gracz - gracz dla którego puszczony jest algorytm alfa-beta"""
+    global alfa, beta
+    fun_wart = fun_oceny["wartosc"]
+    fun_wolne = fun_oceny["wolne"]
+    siatka, ostatni_ruch = stan
+    ruch_wyj = ostatni_ruch
+    ocena = fun_wart(siatka, gracz.przeciwnik, ostatni_ruch)
+    if (poziom < LIMIT and not siatka.ma_uklad_wygrywajacy(ostatni_ruch)):
+        mozliwe_ruchy = fun_wolne(siatka)
+        print("mozliwe ruchy: ", mozliwe_ruchy)
+        for ruch in mozliwe_ruchy:
+            ruch_wyj = ruch
+            stan_prim = dodaj_ruch(siatka, ruch, gracz)
+            bmin, _ = beta_min(stan_prim, gracz, poziom + 1,
+                               fun_oceny)
+            alfa = max(alfa, bmin)
+            if alfa >= beta:
+                ocena = beta
+                break
+        ocena = alfa
+    assert ocena is not None
+    print("ruch alfa = ", ruch_wyj, ocena)
+    return (ocena, ruch_wyj)
+
+def beta_min(stan, gracz, poziom, fun_oceny):
+    """analogicznie do alfa_max, gracz - to gracz dla którego puszczony
+    jest algorytm poszukiwania ruchu"""
+    global alfa, beta
+    fun_wart = fun_oceny["wartosc"]
+    fun_wolne = fun_oceny["wolne"]
+    siatka, ostatni_ruch = stan
+    ruch_wyj = ostatni_ruch
+    ocena = fun_wart(siatka, gracz, ostatni_ruch)
+    if (poziom < LIMIT and not siatka.ma_uklad_wygrywajacy(ostatni_ruch)):
+        mozliwe_ruchy = fun_wolne(siatka)
+        print("mozliwe ruchy: ", mozliwe_ruchy)
+        for ruch in mozliwe_ruchy:
+            ruch_wyj = ruch
+            stan_prim = dodaj_ruch(siatka, ruch, gracz)
+            amax, _ = alfa_max(stan_prim, gracz, poziom + 1,
+                               fun_oceny)
+            beta = min(beta, amax)
+            if beta >= alfa:
+                ocena = alfa
+                break
+        ocena = beta
+    assert ocena is not None
+    print("ruch beta = ", ruch_wyj, ocena)
+    return (ocena, ruch_wyj)
+
+def min_max(stan, gracz):
+    global alfa, beta
+    alfa = -100000
+    beta =  100000
+    poziom = 0
+    fun_oceny = {"wolne": siatka.wolne_pola,
+                 "wartosc": wartosciowanie.max_strony}
+    _, ruch = alfa_max(stan, gracz, poziom, fun_oceny)
+    print("------")
+    return ruch, None

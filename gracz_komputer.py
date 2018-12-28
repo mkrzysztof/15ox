@@ -1,32 +1,39 @@
 """ moduł gracza komputerowego """
+import math
 import time
+import alfa_beta
 import gracz
-import inteligencja
 import siatka
 from monitoring import pokaz_wywolanie
+import symbole
 import wartosciowanie
 
-GLEBOKOSC = 6
+GLEBOKOSC = 10
 FUN_WOLNE = siatka.wolne_pola
-FUN_WART = wartosciowanie.klasyczne_plus_minus
 
-FUN_OCENY = {"wolne": FUN_WOLNE, "wartosc": FUN_WART}
+# tu przechowuję informację o graczach komputerowym i człowieku
+Gracze_Parametry = {
+    "KOMPUTER": {"mnoznik": 1, "symbol": None},
+    "CZLOWIEK": {"mnoznik": -1, "symbol": None}
+    }
 
 class GraczKomputer(gracz.Gracz):
     """Klasa reprezentująca komputer"""
     def __init__(self, symbol, nazwa="GRACZ-KOMPUTER"):
         super().__init__(symbol, nazwa="GRACZ-KOMPUTER")
-    @pokaz_wywolanie
-    def wyszukaj_wolne_pole(self, siatka_przesz):
-        siatka_kopia = siatka_przesz.copy()
-        self.mnoznik = 1
-        self.przeciwnik.mnoznik = - 1
-        czas = time.time()
-        drzewo_decyzji = inteligencja.buduj_drzewo_stopnia(siatka_kopia, self,
-                                                           GLEBOKOSC,
-                                                           FUN_OCENY)
-        print("zbudowano drzewo w {} sekund".format(time.time() - czas))
-        czas = time.time()
-        ruch, _ = inteligencja.min_max(drzewo_decyzji, self)
-        print("obliczono min_max w {} sekund".format(time.time() - czas))
-        return ruch
+        Gracze_Parametry["KOMPUTER"]["symbol"] = symbol
+        Gracze_Parametry["CZLOWIEK"]["symbol"] = symbole.przeciwny(symbol)
+        
+    def wyszukaj_wolne_pole(self, ostatnie_polozenie, siatka_przesz):
+        poziom_pocz = 0
+        ocena_alfa = alfa_beta.OcenaRuchu()
+        ocena_alfa.ruch = None
+        ocena_alfa.ocena = -math.inf
+        ocena_beta = alfa_beta.OcenaRuchu()
+        ocena_beta.ruch = None
+        ocena_beta.ocena = math.inf
+        oceny = {"ALFA": ocena_alfa, "BETA": ocena_beta}
+        ocena_ruchu = alfa_beta.alfa_beta(siatka_przesz, ostatnie_polozenie,
+                                          oceny, poziom_pocz, "ALFA")
+        return ocena_ruchu.ruch
+                                
