@@ -24,6 +24,18 @@ class OcenaRuchu:
         return (self.ocena == value.ocena
                 and self.ruch == value.ruch)
 
+    def __gt__(self, value):
+        return self.ocena.__gt__(value.ocena)
+
+    def __ge__(self, value):
+        return self.ocena.__ge__(value.ocena)
+
+    def __lt__(self, value):
+        return self.ocena.__lt__(value.ocena)
+
+    def __le__(self, value):
+        return self.ocena.__le__(value.ocena)
+
 def przeciwny(etap):
     return "BETA" if etap == "ALFA" else "ALFA"
 
@@ -62,22 +74,37 @@ def alfa_beta(siatka_wej, ruch, oceny, poziom, etap):
     ruch - typu Polozenie
     oceny - słownik z kluczami "ALFA", "BETA" o wartościach OcenaRuchu
     etap {"ALFA", "BETA"} """
-    kopia_oceny = copy.copy(oceny)
     przeciwny_etap = przeciwny(etap)
     biezacy_parametry = gracz_komputer.Gracze_Parametry[GRACZE[etap]]
     if czy_to_koniec(siatka_wej, ruch, etap, poziom):
         wyjscie = ocen_sytuacje(siatka_wej, ruch, GRACZE[przeciwny_etap])
     else:
+        oceny = copy.copy(oceny)
         dostepne_ruchy = siatka.otoczenie(siatka_wej)
         for wolny_ruch in dostepne_ruchy:
+            ostatni_ruch = wolny_ruch
             nast_siatka = stworz_siatke(siatka_wej, wolny_ruch,
                                         biezacy_parametry["symbol"])
-            wynik = alfa_beta(nast_siatka, wolny_ruch, kopia_oceny,
+            wynik = alfa_beta(nast_siatka, wolny_ruch, oceny,
                               poziom + 1, przeciwny_etap)
-            if _porownanie[etap](wynik.ocena, kopia_oceny[etap].ocena):
-                kopia_oceny[etap] = wynik
-            if kopia_oceny["ALFA"].ocena >= kopia_oceny["BETA"].ocena:
-                wyjscie = kopia_oceny[przeciwny_etap]
-                break
-        wyjscie = kopia_oceny[etap]
+            if etap == "ALFA":
+                ocena_alfa = oceny["ALFA"].ocena
+                oceny[etap].ocena = max(oceny[etap].ocena, wynik.ocena)
+                if oceny[etap].ocena != ocena_alfa:
+                    oceny[etap].ruch = wolny_ruch
+                if oceny["ALFA"] >= oceny["BETA"]:
+                    wyjscie = oceny["BETA"]
+                    wyjscie.ruch = oceny["ALFA"].ruch
+                    break
+            if etap == "BETA":
+                ocena_beta = oceny["BETA"].ocena
+                oceny[etap].ocena = min(oceny["BETA"].ocena, wynik.ocena)
+                if oceny[etap].ocena != ocena_beta:
+                    oceny[etap].ruch = wolny_ruch
+                if oceny["ALFA"] >= oceny["BETA"]:
+                    wyjscie = oceny["ALFA"]
+                    wyjscie.ruch = oceny["BETA"].ruch
+                    break
+        wyjscie = oceny[etap]
+        wyjscie.ruch = ostatni_ruch
     return wyjscie
