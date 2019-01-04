@@ -1,5 +1,5 @@
 """zawiera potrzebne klasy"""
-
+import copy
 import enum
 
 class Faza(enum.Enum):
@@ -16,7 +16,7 @@ def przeciwna(f):
 
 def mnoznik(f):
     """z jakim znakiem przyznawane są punkty za sytuację na planszy"""
-    if f == ALFA:
+    if f == Faza.ALFA:
         return 1
     else:
         return -1
@@ -38,7 +38,7 @@ class Ocena:
         self._ruch = ruch
         self._wartosc = wartosc
 
-    def wymien_ruch(ruch):
+    def wymien_ruch(self, ruch):
         self._ruch = ruch
         
     def wieksza(self, n):
