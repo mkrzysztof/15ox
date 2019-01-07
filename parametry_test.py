@@ -45,6 +45,16 @@ class OcenaTest(unittest.TestCase):
         for oc1, oc2 in zip(oceny1, oceny2):
             self.assertEqual(oc1.wieksza_rowna(oc2), True)
 
+    def test_rownosc(self):
+        a = parametry.Ocena("x", 12)
+        b = parametry.Ocena("x", 12)
+        self.assertEqual(a == b, True)
+
+    def test_nie_rownosc(self):
+        a = parametry.Ocena("x", 12)
+        b = parametry.Ocena("y", 12)
+        self.assertNotEqual(a == b, True)
+
 class GraczeTest(unittest.TestCase):    
     def test_gracze_faza(self):
         gracze = parametry.Gracze("GRACZ_A", "GRACZ_B")

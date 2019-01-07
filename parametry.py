@@ -1,6 +1,10 @@
 """zawiera potrzebne klasy"""
+import collections
+import math
 import copy
 import enum
+
+StanGry = collections.namedtuple("StanGry", "siatka ostatni_ruch")
 
 class Faza(enum.Enum):
     """reprezentuje fazę w algorytmie alfa-beta"""
@@ -35,6 +39,9 @@ class Gracze:
 class Ocena:
     """ocena potrzebna do zdecydowania o ruchu"""
     def __init__(self, ruch, wartosc):
+        """ inicjalizuje self
+        ruch to siatka.Polozenie
+        wartosc to wartość liczbowa po wykonaniu ruchu ruch """
         self._ruch = ruch
         self._wartosc = wartosc
 
@@ -52,11 +59,29 @@ class Ocena:
         """self < n po wartościach"""
         return self._wartosc < n._wartosc
 
+    def copy(self):
+        """kopiuje obiekt"""
+        return Ocena(self._ruch, self._wartosc)
+
+    def __eq__(self, value):
+        return self._ruch == value._ruch and self._wartosc == value._wartosc
+
+    def __repr__(self):
+        lista_nap = ["(", repr(self._ruch), ", ", repr(self._wartosc), ")"]
+        return "".join(lista_nap)
+        
+
+def nowe_ograniczenia():
+    """stwarza nowe początkowe ograniczenia alfa = -inf, beta = +inf"""
+    ocena_alfa = Ocena(None, -math.inf)
+    ocena_beta = Ocena(None, math.inf)
+    return Ograniczenia(ocena_alfa, ocena_beta)
 
 class Ograniczenia:
     """dolne i górne ograniczenie w algorytmie alfa-beta"""
-    def __init__(self):
-        self._ograniczenia = {Faza.ALFA: None, Faza.BETA: None}
+    def __init__(self, ocena_alfa=None, ocena_beta=None):
+        self._ograniczenia = {Faza.ALFA: ocena_alfa, Faza.BETA: ocena_beta}
+
 
     def pobierz(self, f):
         """pobiera ograniczenie typu Ocena dla fazy f"""
@@ -90,3 +115,8 @@ class Ograniczenia:
         if self.czy_aktualizowac(f, n):
             self.aktualizuj(f, n, ruch)
 
+    def copy(self):
+        ogr_copy = Ograniczenia()
+        for k in self._ograniczenia.keys():
+            ogr_copy._ograniczenia[k] = self._ograniczenia[k]
+        return ogr_copy

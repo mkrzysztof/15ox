@@ -105,5 +105,6 @@ class TestSiatka(ut.TestCase):
             testowany = s.otoczenie()
             self.assertEqual(w, testowany)
 
+
 if __name__ == "__main__":
     ut.main()
