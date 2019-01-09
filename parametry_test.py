@@ -55,14 +55,6 @@ class OcenaTest(unittest.TestCase):
         b = parametry.Ocena("y", 12)
         self.assertNotEqual(a == b, True)
 
-class GraczeTest(unittest.TestCase):    
-    def test_gracze_faza(self):
-        gracze = parametry.Gracze("GRACZ_A", "GRACZ_B")
-        fazy = [parametry.Faza.ALFA, parametry.Faza.BETA]
-        wlasciwe = ["GRACZ_A", "GRACZ_B"]
-        wyniki = [gracze.gracz_w_fazie(f) for f in fazy]
-        for wlasciwy, wynik in zip(wlasciwe, wyniki):
-            self.assertEqual(wlasciwy, wynik)
 
 class OgraniczeniaTest(unittest.TestCase):
     def test_aktualizuj(self):

@@ -17,7 +17,7 @@ def inicjuj_graczy(gracz_alfa, gracz_beta):
 def stworz_nowy_stan(stan_wej, faza, ruch):
     """zwraca nową siatkę powstałą po dodaniu ruchu przy danej fazie"""
     nast_siatka = stan_wej.siatka.copy()
-    nast_siatka[ruch] = _Gracze[faza].sybol
+    nast_siatka[ruch] = _Gracze[faza].symbol
     nast_stan = parametry.StanGry(siatka=nast_siatka, ostatni_ruch=ruch)
     return nast_stan
 

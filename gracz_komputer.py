@@ -28,4 +28,4 @@ class GraczKomputer(gracz.Gracz):
         ocena_ruchu = alfa_beta.alfa_beta(stan_poczatkowy, parametry.Faza.ALFA,
                                           0, oceny)
         print("oceniony ruch = ", ocena_ruchu)
-        return ocena_ruchu.pokaz_ruch()
+        return ocena_ruchu.ruch
