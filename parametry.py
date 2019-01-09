@@ -35,7 +35,6 @@ class Gracze:
         """gracz przypisany do fazy f"""
         return self._gracze[f]
 
-
 class Ocena:
     """ocena potrzebna do zdecydowania o ruchu"""
     def __init__(self, ruch, wartosc):
@@ -47,6 +46,9 @@ class Ocena:
 
     def wymien_ruch(self, ruch):
         self._ruch = ruch
+
+    def pokaz_ruch(self):
+        return self._ruch
         
     def wieksza(self, n):
         """self > n po wartościach"""
@@ -107,13 +109,13 @@ class Ograniczenia:
         else:
             return n.mniejsza(ocena_f)
 
-    def warunkowo_aktualizuj(self, f, n, ruch):
+    def warunkowo_aktualizuj(self, f, n, stan_gry):
         """aktualizacja obiektu, gdy zachodzi taka potrzeba
         f -- faza w której aktualizujemy
         n -- ocena
-        ruch -- ruch który w danej chwili jest rozpatrywany"""
+        stan_gry -- stan_gry który w danej chwili jest rozpatrywany"""
         if self.czy_aktualizowac(f, n):
-            self.aktualizuj(f, n, ruch)
+            self.aktualizuj(f, n, stan_gry.ostatni_ruch)
 
     def copy(self):
         ogr_copy = Ograniczenia()

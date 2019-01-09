@@ -1,8 +1,20 @@
 import unittest as ut
 import siatka
+import symbole
 
 WIERSZY = 0
 KOLUMN = 1
+
+def zbuduj_siatke(polozenia, wymiar=(3, 3)):
+    # polozenia mają format słownika
+    # "KOLKO" :   lista krotek reprezentująca położenia
+    # "KRZYZYK" : ----------------------"-------------
+    # zwraca obiekt siatka
+    budowana_siatka = siatka.Siatka(*wymiar)
+    for symbol in [symbole.Kolko, symbole.Krzyzyk]:
+        for poz in polozenia[symbol]:
+            budowana_siatka[siatka.Polozenie(poz)] = symbol
+    return budowana_siatka
 
 class TestPolozenie(ut.TestCase):
     testowe = [
@@ -81,7 +93,7 @@ class TestSiatka(ut.TestCase):
         ile = siatka_t.policz_symbol(symbol, polozenie(1,2), siatka.LEWO)
         self.assertEqual(0, ile)
 
-    siatki = [siatka.Siatka(10, 10), siatka.Siatka(10, 10)]
+    siatki = [siatka.Siatka(10, 10), siatka.Siatka(10, 10),]
     polozenia = [siatka.Polozenie((2, 3)),
                  siatka.Polozenie((0, 0)),
     ]
@@ -104,6 +116,16 @@ class TestSiatka(ut.TestCase):
             s[p] = "x"
             testowany = s.otoczenie()
             self.assertEqual(w, testowany)
+
+    def test_otoczenie2(self):
+        test_siatka = zbuduj_siatke(
+            {symbole.Kolko: [(2, 2), (1, 1)],
+             symbole.Krzyzyk: [(1, 0), (1, 2)]}
+             )
+        otoczenie = {siatka.Polozenie(k) for k in [(0, 0), (0, 1), (0, 2),
+                                                   (2, 0), (2, 1)]}
+        otocz_siatka = test_siatka.otoczenie()
+        self.assertEqual(otoczenie, otocz_siatka)
 
 
 if __name__ == "__main__":

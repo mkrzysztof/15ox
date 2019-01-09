@@ -11,7 +11,7 @@ class Gracz(object):
         self.przeciwnik = None
         self.nazwa = nazwa
 
-    def wyszukaj_wolne_pole(self, siatka):
+    def wyszukaj_wolne_pole(self, ostatnie_polozenie, siatka_przesz):
         """metoda obstrakcyjna zwraca siatka.Polozenie reprezentującą położenie
         na polu planszy """
         pass
@@ -37,11 +37,11 @@ class Gracz(object):
 class GraczCzlowiek(Gracz):
     """Klasa reprezentująca człowieka"""
 
-    def wyszukaj_wolne_pole(self, ostatnie_polozenie, siatka):
+    def wyszukaj_wolne_pole(self, ostatnie_polozenie, siatka_przesz):
         zla_pozycja = True
         while zla_pozycja:
             polozenie = grafika.odczyt_poz_myszy()
-            if (siatka.zawiera_polozenie(polozenie)
-                    and siatka[polozenie] is None):
+            if (siatka_przesz.zawiera_polozenie(polozenie)
+                    and siatka_przesz[polozenie] is None):
                 zla_pozycja = False
         return polozenie

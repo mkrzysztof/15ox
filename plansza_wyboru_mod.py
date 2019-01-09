@@ -1,7 +1,9 @@
 """zawiera ustawienia gry"""
+import alfa_beta
 import gracz
 import symbole
 import gracz_komputer
+
 
 PLANSZA_ROZMIAR = (15, 15)
 WYGRYWAJACYCH = 3
@@ -47,6 +49,7 @@ def wybierz_gracz_komputer():
     global GRACZ1, GRACZ2
     GRACZ1 = gracz.GraczCzlowiek(symbole.Kolko, "Gracz1")
     GRACZ2 = gracz_komputer.GraczKomputer(symbole.Krzyzyk, "Gracz2")
+    alfa_beta.inicjuj_graczy(GRACZ2, GRACZ1)
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
 
@@ -54,5 +57,6 @@ def wybierz_komputer_gracz():
     global GRACZ1, GRACZ2
     GRACZ1 = gracz_komputer.GraczKomputer(symbole.Kolko, "Gracz1")
     GRACZ2 = gracz.GraczCzlowiek(symbole.Krzyzyk, "Gracz2")
+    alfa_beta.inicjuj_graczy(GRACZ1, GRACZ2)
     GRACZ1.przeciwnik = GRACZ2
     GRACZ2.przeciwnik = GRACZ1
