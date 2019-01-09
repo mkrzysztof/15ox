@@ -69,7 +69,6 @@ class PrzyciskGraf:
         pygame.display.flip()
         przycisk.surface.blit(ODZNACZONY, zajmowany_obszar.topleft)
         pygame.display.flip()
-        print("wyczysc")
         self.jest_aktywny = False
         
     def wykryj_klikniecie(self, pygame_events):

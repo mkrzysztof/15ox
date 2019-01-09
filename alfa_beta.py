@@ -49,5 +49,7 @@ def alfa_beta(stan_gry, biezaca_faza, poziom, limity):
             limity.warunkowo_aktualizuj(biezaca_faza, nast_ocena, nast_stan)
             if limity.czy_ciecie():
                 kont_petle = False
-        wyjscie = limity.pobierz(biezaca_faza)
+                wyjscie = limity.pobierz(przeciwna_faza)
+        if kont_petle:
+            wyjscie = limity.pobierz(biezaca_faza)
     return wyjscie
